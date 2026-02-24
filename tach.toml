@@ -1,0 +1,24 @@
+source_roots = ["packages/*/src"]
+
+[[modules]]
+path = "domain"
+depends_on = []
+
+[[modules]]
+path = "application"
+depends_on = ["domain"]
+
+[[modules]]
+path = "infrastructure"
+depends_on = ["domain", "application"]
+
+[[modules]]
+path = "bootstrap"
+depends_on = ["application", "infrastructure"]
+
+[[modules]]
+path = "api"
+depends_on = ["application", "bootstrap", "domain"]
+
+[external]
+exclude = ["uvicorn"]

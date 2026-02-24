@@ -1,0 +1,45 @@
+[project]
+name = "project-spike"
+version = "0.1.0"
+requires-python = ">=3.12"
+dependencies = [
+    "domain",
+    "infrastructure",
+    "application",
+    "bootstrap",
+    "api",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.0",
+    "pytest-asyncio>=0.24",
+    "testcontainers[postgres,redis]>=4.0",
+    "httpx>=0.27",
+]
+
+[tool.uv.workspace]
+members = [
+    "packages/domain",
+    "packages/infrastructure",
+    "packages/application",
+    "packages/bootstrap",
+    "packages/api",
+]
+
+[tool.uv.sources]
+domain = { workspace = true }
+infrastructure = { workspace = true }
+application = { workspace = true }
+bootstrap = { workspace = true }
+api = { workspace = true }
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+asyncio_default_test_loop_scope = "session"
+asyncio_default_fixture_loop_scope = "session"
+testpaths = [
+    "packages/infrastructure/tests",
+    "packages/application/tests",
+    "packages/api/tests",
+]

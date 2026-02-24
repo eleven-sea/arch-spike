@@ -1,0 +1,55 @@
+import os
+
+from alembic import context
+from sqlalchemy import create_engine, pool
+
+from infrastructure.database.base import Base
+
+# Import all ORM models so their tables are registered in Base.metadata
+import infrastructure.database.models.member_models  # noqa: F401
+import infrastructure.database.models.coach_models  # noqa: F401
+import infrastructure.database.models.plan_models  # noqa: F401
+
+target_metadata = Base.metadata
+
+
+def get_sync_url() -> str:
+    host = os.environ.get("DATABASE_HOST", "localhost")
+    port = os.environ.get("DATABASE_PORT", "5432")
+    user = os.environ.get("DATABASE_USER", "postgres")
+    password = os.environ.get("DATABASE_PASSWORD", "postgres")
+    dbname = os.environ.get("DATABASE_DBNAME", "project_spike")
+    return f"postgresql+psycopg2://{user}:{password}@{host}:{port}/{dbname}"
+
+
+def run_migrations_offline():
+    context.configure(
+        url=get_sync_url(),
+        target_metadata=target_metadata,
+        literal_binds=True,
+        dialect_opts={"paramstyle": "named"},
+    )
+    with context.begin_transaction():
+        context.run_migrations()
+
+
+def run_migrations_online():
+    connectable = context.config.attributes.get("connection", None)
+
+    if connectable is not None:
+        context.configure(connection=connectable, target_metadata=target_metadata)
+        with context.begin_transaction():
+            context.run_migrations()
+        return
+
+    connectable = create_engine(get_sync_url(), poolclass=pool.NullPool)
+    with connectable.connect() as connection:
+        context.configure(connection=connection, target_metadata=target_metadata)
+        with context.begin_transaction():
+            context.run_migrations()
+
+
+if context.is_offline_mode():
+    run_migrations_offline()
+else:
+    run_migrations_online()

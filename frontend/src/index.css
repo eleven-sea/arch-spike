@@ -1,0 +1,60 @@
+@import url('https://fonts.googleapis.com/css2?family=Anton&family=Outfit:wght@300;400;500;600;700&family=Fira+Code:wght@400;500&display=swap');
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --bg:           #090c10;
+  --surface:      #0e1318;
+  --card:         #131920;
+  --card-hover:   #161f28;
+  --border:       #1c242e;
+  --border-hover: #2a3848;
+
+  --accent:       #9dff3c;
+  --accent-dim:   rgba(157, 255, 60, 0.5);
+  --accent-glow:  rgba(157, 255, 60, 0.09);
+
+  --cyan:         #3cf4ff;
+  --cyan-glow:    rgba(60, 244, 255, 0.08);
+
+  --orange:       #ff7c3c;
+  --danger:       #ff3c5e;
+  --danger-dim:   rgba(255, 60, 94, 0.12);
+  --success:      #3cff9d;
+  --success-dim:  rgba(60, 255, 157, 0.1);
+  --warning:      #ffcc3c;
+  --warning-dim:  rgba(255, 204, 60, 0.1);
+
+  --text:         #e8f0f8;
+  --text-muted:   #5a7a98;
+  --text-dim:     #2e4256;
+
+  --font-display: 'Anton', sans-serif;
+  --font-body:    'Outfit', sans-serif;
+  --font-mono:    'Fira Code', monospace;
+}
+
+html, body, #root {
+  height: 100%;
+  overflow: hidden;
+}
+
+body {
+  font-family: var(--font-body);
+  font-size: 14px;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+::-webkit-scrollbar          { width: 5px; height: 5px; }
+::-webkit-scrollbar-track    { background: transparent; }
+::-webkit-scrollbar-thumb    { background: var(--border-hover); }
+::-webkit-scrollbar-thumb:hover { background: var(--text-dim); }
+
+button { font-family: var(--font-body); }
