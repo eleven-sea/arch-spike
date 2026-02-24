@@ -9,6 +9,6 @@ class TransactionManager:
         self._database = database
 
     @asynccontextmanager
-    async def transaction(self) -> AsyncIterator[None]:
-        async with self._database.transaction():
+    async def transaction(self, new: bool = False) -> AsyncIterator[None]:
+        async with self._database.transaction(new=new):
             yield

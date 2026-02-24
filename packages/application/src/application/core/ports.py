@@ -3,7 +3,7 @@ from typing import Protocol
 
 
 class ITransactionManager(Protocol):
-    def transaction(self) -> AbstractAsyncContextManager[None]: ...
+    def transaction(self, new: bool = False) -> AbstractAsyncContextManager[None]: ...
 
 
 class ICache(Protocol):

@@ -48,9 +48,9 @@ class Database:
                 _logger.debug("Session closed %s", id(session))
 
     @asynccontextmanager
-    async def transaction(self):
+    async def transaction(self, new: bool = False):
         existing = _current_session.get()
-        if existing is not None:
+        if existing is not None and not new:
             _logger.debug("Reusing existing transaction session %s", id(existing))
             yield existing
             return
