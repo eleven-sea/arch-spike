@@ -1,10 +1,11 @@
 from contextlib import asynccontextmanager
 from typing import AsyncIterator
 
+from application.core.ports import ITransactionManager
 from infrastructure.database.session import Database
 
 
-class TransactionManager:
+class TransactionManager(ITransactionManager):
     def __init__(self, database: Database):
         self._database = database
 
