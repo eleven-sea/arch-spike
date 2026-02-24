@@ -6,7 +6,6 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from bootstrap.context import ApplicationContext
-from api.middleware.db_session import DbSessionMiddleware
 from api.routers import members, coaches, plans
 
 
@@ -29,7 +28,6 @@ def create_api(ctx: ApplicationContext | None = None) -> FastAPI:
         allow_methods=["*"],
         allow_headers=["*"],
     )
-    app.add_middleware(DbSessionMiddleware)
     app.include_router(members.router)
     app.include_router(coaches.router)
     app.include_router(plans.router)

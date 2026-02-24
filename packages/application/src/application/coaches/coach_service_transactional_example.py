@@ -9,7 +9,7 @@ from domain.members.repositories import IMemberRepository
 from domain.services.coach_matching import CoachMatchingService
 from application.core.events import IEventDispatcher
 from application.core.logger import ILogger
-from application.core.ports import ICache
+from application.core.ports import ICache, ITransactionManager
 
 _CACHE_TTL = 300  # 5 minutes
 
@@ -22,12 +22,14 @@ class CoachService:
             cache: ICache,
             dispatcher: IEventDispatcher,
             app_logger: ILogger,
+            tm: ITransactionManager
     ) -> None:
         self._repo = coach_repo
         self._member_repo = member_repo
         self._cache = cache
         self._dispatcher = dispatcher
         self._logger = app_logger.get_logger(__name__)
+        self._tm = tm
 
     async def register(
             self,
@@ -42,6 +44,7 @@ class CoachService:
         if await self._repo.get_by_email(email) is not None:
             raise ValueError(f"Email {email!r} already registered")
 
+
         coach = Coach.create(
             first_name=first_name,
             last_name=last_name,
@@ -52,8 +55,20 @@ class CoachService:
             max_clients=max_clients,
         )
 
+        coach2 = Coach.create(
+            first_name=first_name,
+            last_name=last_name,
+            email=email,
+            bio=bio,
+            tier=CoachTier(tier),
+            specializations=frozenset(Specialization(s) for s in specializations),
+            max_clients=max_clients,
+        )
+
         # some changes
-        saved = await self._repo.save(coach)
+        async with self._tm.transaction():
+            saved = await self._repo.save(coach)
+            saved2 = await self._repo.save(coach2)
 
         self._logger.info("Coach registered: %s (id=%s)", saved.email.value, saved.id)
 
