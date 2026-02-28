@@ -1,24 +1,25 @@
-from __future__ import annotations
 
-from dataclasses import dataclass, field
 from datetime import date
+from typing import Self
+
+from pydantic import BaseModel, PrivateAttr
 
 from domain.plans.entities import WorkoutSession
 from domain.plans.value_objects import PlanStatus, SessionStatus
+from domain.shared.events import ApplicationEvent
 
 
-@dataclass
-class TrainingPlan:
+class TrainingPlan(BaseModel):
     member_id: int
     coach_id: int
     name: str
     status: PlanStatus
     starts_at: date
     ends_at: date
-    sessions: list[WorkoutSession] = field(default_factory=list)
+    sessions: list[WorkoutSession] = []
     id: int | None = None
 
-    _events: list = field(default_factory=list, repr=False, compare=False)
+    _events: list[ApplicationEvent] = PrivateAttr(default_factory=list)  # pyright: ignore[reportUnknownVariableType]
 
     @classmethod
     def create(
@@ -28,7 +29,7 @@ class TrainingPlan:
         name: str,
         starts_at: date,
         ends_at: date,
-    ) -> "TrainingPlan":
+    ) -> Self:
         from domain.plans.events import PlanCreated
 
         plan = cls(
@@ -86,7 +87,6 @@ class TrainingPlan:
                 )
             )
 
-        # Auto-complete plan when all sessions are done
         all_done = all(
             s.status in (SessionStatus.COMPLETED, SessionStatus.SKIPPED)
             for s in self.sessions
@@ -103,6 +103,6 @@ class TrainingPlan:
             raise ValueError(f"Cannot cancel a {self.status.value} plan")
         self.status = PlanStatus.CANCELLED
 
-    def pull_events(self) -> list:
+    def pull_events(self) -> list[ApplicationEvent]:
         events, self._events = self._events, []
         return events

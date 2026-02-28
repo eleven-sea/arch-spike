@@ -1,20 +1,22 @@
 import redis.asyncio as redis
+from redis.asyncio.client import PubSub
 
 
 class RedisClient:
     def __init__(self, url: str):
         self._redis = redis.from_url(url, decode_responses=True)
 
-    # ── Pub/Sub ──────────────────────────────────────────────────────────
     async def publish(self, channel: str, message: str) -> None:
-        await self._redis.publish(channel, message)
+        await self._redis.publish(channel, message)  # pyright: ignore[reportUnknownMemberType]
+
+    def pubsub(self) -> PubSub:
+        return self._redis.pubsub()  # pyright: ignore[reportUnknownMemberType]
 
     async def subscribe(self, channel: str):
-        pubsub = self._redis.pubsub()
-        await pubsub.subscribe(channel)
+        pubsub = self._redis.pubsub()  # pyright: ignore[reportUnknownMemberType]
+        await pubsub.subscribe(channel)  # pyright: ignore[reportUnknownMemberType]
         return pubsub
 
-    # ── Cache ─────────────────────────────────────────────────────────────
     async def get(self, key: str) -> str | None:
         return await self._redis.get(key)
 

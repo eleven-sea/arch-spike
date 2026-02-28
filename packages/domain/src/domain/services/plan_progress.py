@@ -1,4 +1,3 @@
-from __future__ import annotations
 
 from domain.plans.training_plan import TrainingPlan
 from domain.plans.value_objects import SessionStatus

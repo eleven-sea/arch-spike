@@ -1,15 +1,16 @@
-from typing import Generic, TypeVar
+from collections.abc import Callable
+from contextlib import AbstractAsyncContextManager
 
 from sqlalchemy import func, select
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from infrastructure.database.base import Base
 
-T = TypeVar("T", bound=Base)
-ID = TypeVar("ID")
+type SessionFactory = Callable[[], AbstractAsyncContextManager[AsyncSession]]
 
 
-class BaseRepository(Generic[T, ID]):
-    def __init__(self, model: type[T], session_factory):
+class BaseRepository[T: Base, ID]:
+    def __init__(self, model: type[T], session_factory: SessionFactory) -> None:
         self._model = model
         self._session_factory = session_factory
 

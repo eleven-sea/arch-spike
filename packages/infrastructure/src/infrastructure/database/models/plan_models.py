@@ -1,8 +1,5 @@
-from __future__ import annotations
 
-import json
 from datetime import date, datetime
-from typing import List, Optional
 
 from sqlalchemy import BigInteger, Date, DateTime, ForeignKey, Integer, String, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -35,10 +32,10 @@ class WorkoutSessionORM(Base):
     name: Mapped[str] = mapped_column(String(200), nullable=False)
     scheduled_date: Mapped[date] = mapped_column(Date, nullable=False)
     status: Mapped[str] = mapped_column(String(20), nullable=False, default="PENDING")
-    completed_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
-    notes: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    completed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    notes: Mapped[str | None] = mapped_column(Text, nullable=True)
 
-    exercises: Mapped[List[PlannedExerciseORM]] = relationship(
+    exercises: Mapped[list[PlannedExerciseORM]] = relationship(
         "PlannedExerciseORM",
         cascade="all, delete-orphan",
         lazy="selectin",
@@ -56,7 +53,7 @@ class TrainingPlanORM(Base):
     starts_at: Mapped[date] = mapped_column(Date, nullable=False)
     ends_at: Mapped[date] = mapped_column(Date, nullable=False)
 
-    sessions: Mapped[List[WorkoutSessionORM]] = relationship(
+    sessions: Mapped[list[WorkoutSessionORM]] = relationship(
         "WorkoutSessionORM",
         cascade="all, delete-orphan",
         lazy="selectin",

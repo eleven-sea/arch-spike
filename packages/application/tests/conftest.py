@@ -1,8 +1,5 @@
-from __future__ import annotations
 
 import logging
-from contextlib import asynccontextmanager
-from typing import Optional
 from unittest.mock import AsyncMock, MagicMock
 
 import pytest
@@ -17,8 +14,6 @@ from domain.plans.repositories import ITrainingPlanRepository
 from domain.plans.training_plan import TrainingPlan
 
 
-# ── In-memory repositories ────────────────────────────────────────────────────
-
 class InMemoryMemberRepository(IMemberRepository):
     def __init__(self) -> None:
         self._store: dict[int, Member] = {}
@@ -28,7 +23,6 @@ class InMemoryMemberRepository(IMemberRepository):
         if member.id is None:
             member.id = self._next_id
             self._next_id += 1
-            # also assign IDs to goals
             for goal in member.goals:
                 if goal.id is None:
                     goal.id = self._next_id
@@ -91,7 +85,6 @@ class InMemoryPlanRepository(ITrainingPlanRepository):
                     session.id = self._next_id
                     self._next_id += 1
         else:
-            # Update existing - assign IDs to new sessions
             for session in plan.sessions:
                 if session.id is None:
                     session.id = self._next_id
@@ -108,8 +101,6 @@ class InMemoryPlanRepository(ITrainingPlanRepository):
     async def delete(self, id: int) -> None:
         self._store.pop(id, None)
 
-
-# ── Fixtures ─────────────────────────────────────────────────────────────────
 
 @pytest.fixture()
 def member_repo() -> InMemoryMemberRepository:
@@ -155,6 +146,13 @@ def fake_exercise_client():
 def fake_broker():
     mock = AsyncMock()
     mock.publish.return_value = None
+    return mock
+
+
+@pytest.fixture()
+def fake_task_dispatcher():
+    mock = AsyncMock()
+    mock.dispatch.return_value = None
     return mock
 
 

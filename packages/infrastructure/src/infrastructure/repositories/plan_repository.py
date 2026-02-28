@@ -1,22 +1,25 @@
-from __future__ import annotations
+
+from typing import override
 
 from sqlalchemy import select
 
 from domain.plans.repositories import ITrainingPlanRepository
 from domain.plans.training_plan import TrainingPlan
-from infrastructure.database.base_repository import BaseRepository
+from infrastructure.database.base_repository import BaseRepository, SessionFactory
 from infrastructure.database.mappers.plan_mapper import PlanMapper
 from infrastructure.database.models.plan_models import TrainingPlanORM
 
 
 class PostgresTrainingPlanRepository(BaseRepository[TrainingPlanORM, int], ITrainingPlanRepository):
-    def __init__(self, session_factory) -> None:
+    def __init__(self, session_factory: SessionFactory) -> None:
         super().__init__(TrainingPlanORM, session_factory)
 
+    @override
     async def get_by_id(self, id: int) -> TrainingPlan | None:
         orm = await self.find_by_id(id)
         return PlanMapper.to_domain(orm) if orm else None
 
+    @override
     async def get_by_member(self, member_id: int) -> list[TrainingPlan]:
         async with self._session_factory() as session:
             result = await session.execute(
@@ -25,7 +28,8 @@ class PostgresTrainingPlanRepository(BaseRepository[TrainingPlanORM, int], ITrai
             orms = result.scalars().all()
             return [PlanMapper.to_domain(o) for o in orms]
 
-    async def save(self, plan: TrainingPlan) -> TrainingPlan:
+    @override
+    async def save(self, plan: TrainingPlan) -> TrainingPlan:  # pyright: ignore[reportIncompatibleMethodOverride]
         async with self._session_factory() as session:
             orm = PlanMapper.to_orm(plan)
             merged = await session.merge(orm)
@@ -33,5 +37,6 @@ class PostgresTrainingPlanRepository(BaseRepository[TrainingPlanORM, int], ITrai
             await session.refresh(merged, attribute_names=["sessions"])
             return PlanMapper.to_domain(merged)
 
+    @override
     async def delete(self, id: int) -> None:
         await super().delete(id)

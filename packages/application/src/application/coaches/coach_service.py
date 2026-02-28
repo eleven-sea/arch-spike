@@ -1,17 +1,16 @@
-from __future__ import annotations
 
 import json
 
+from application.core.events import IEventDispatcher
+from application.core.logger import ILogger
+from application.core.ports import ICache
 from domain.coaches.coach import Coach
 from domain.coaches.repositories import ICoachRepository
 from domain.coaches.value_objects import CoachTier, Specialization
 from domain.members.repositories import IMemberRepository
 from domain.services.coach_matching import CoachMatchingService
-from application.core.events import IEventDispatcher
-from application.core.logger import ILogger
-from application.core.ports import ICache
 
-_CACHE_TTL = 300  # 5 minutes
+_CACHE_TTL = 300
 
 
 class CoachService:
@@ -52,12 +51,10 @@ class CoachService:
             max_clients=max_clients,
         )
 
-        # some changes
         saved = await self._repo.save(coach)
 
         self._logger.info("Coach registered: %s (id=%s)", saved.email.value, saved.id)
 
-        # Invalidate relevant caches
         for spec in saved.specializations:
             await self._cache.delete(f"coaches:available:{spec.value}")
 
@@ -100,44 +97,10 @@ class CoachService:
             await self._cache.delete("coaches:available:ALL")
         await self._repo.delete(coach_id)
 
-    # ------------------------------------------------------------------
-    # Serialisation helpers (simple JSON, no heavy dependencies)
-    # ------------------------------------------------------------------
     @staticmethod
     def _serialize_coaches(coaches: list[Coach]) -> str:
-        return json.dumps(
-            [
-                {
-                    "id": c.id,
-                    "first_name": c.name.first_name,
-                    "last_name": c.name.last_name,
-                    "email": c.email.value,
-                    "bio": c.bio,
-                    "tier": c.tier.value,
-                    "specializations": [s.value for s in c.specializations],
-                    "max_clients": c.max_clients,
-                    "current_client_count": c.current_client_count,
-                }
-                for c in coaches
-            ]
-        )
+        return json.dumps([c.model_dump(mode="json") for c in coaches])
 
     @staticmethod
     def _deserialize_coaches(data: str) -> list[Coach]:
-        from domain.shared.value_objects import Email, FullName
-
-        items = json.loads(data)
-        coaches = []
-        for item in items:
-            coach = Coach(
-                id=item["id"],
-                name=FullName(item["first_name"], item["last_name"]),
-                email=Email(item["email"]),
-                bio=item["bio"],
-                tier=CoachTier(item["tier"]),
-                specializations=frozenset(Specialization(s) for s in item["specializations"]),
-                max_clients=item["max_clients"],
-                current_client_count=item["current_client_count"],
-            )
-            coaches.append(coach)
-        return coaches
+        return [Coach.model_validate(item) for item in json.loads(data)]

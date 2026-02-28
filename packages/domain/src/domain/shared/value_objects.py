@@ -1,42 +1,54 @@
-from __future__ import annotations
 
 import re
-from dataclasses import dataclass
+from typing import ClassVar
+
+from pydantic import BaseModel, ConfigDict, field_validator
 
 
-@dataclass(frozen=True)
-class FullName:
+class FullName(BaseModel):
+    model_config = ConfigDict(frozen=True)
+
     first_name: str
     last_name: str
 
-    def __post_init__(self) -> None:
-        if not self.first_name.strip():
-            raise ValueError("first_name cannot be blank")
-        if not self.last_name.strip():
-            raise ValueError("last_name cannot be blank")
+    @field_validator("first_name", "last_name")
+    @classmethod
+    def not_blank(cls, v: str) -> str:
+        v = v.strip()
+        if not v:
+            raise ValueError("cannot be blank")
+        return v
 
     @property
     def full(self) -> str:
         return f"{self.first_name} {self.last_name}"
 
 
-@dataclass(frozen=True)
-class Email:
+class Email(BaseModel):
+    model_config = ConfigDict(frozen=True)
+
+    _PATTERN: ClassVar[re.Pattern[str]] = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
+
     value: str
 
-    _PATTERN: re.Pattern = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
+    @field_validator("value")
+    @classmethod
+    def valid_email(cls, v: str) -> str:
+        if not cls._PATTERN.match(v):
+            raise ValueError(f"Invalid email: {v!r}")
+        return v
 
-    def __post_init__(self) -> None:
-        if not self._PATTERN.match(self.value):
-            raise ValueError(f"Invalid email: {self.value!r}")
 
+class PhoneNumber(BaseModel):
+    model_config = ConfigDict(frozen=True)
 
-@dataclass(frozen=True)
-class PhoneNumber:
+    _PATTERN: ClassVar[re.Pattern[str]] = re.compile(r"^\+?[1-9]\d{6,14}$")
+
     value: str
 
-    _PATTERN: re.Pattern = re.compile(r"^\+?[1-9]\d{6,14}$")
-
-    def __post_init__(self) -> None:
-        if not self._PATTERN.match(self.value):
-            raise ValueError(f"Invalid phone number: {self.value!r}")
+    @field_validator("value")
+    @classmethod
+    def valid_phone(cls, v: str) -> str:
+        if not cls._PATTERN.match(v):
+            raise ValueError(f"Invalid phone number: {v!r}")
+        return v

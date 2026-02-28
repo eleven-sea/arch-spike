@@ -1,5 +1,4 @@
 """E2E tests for /plans endpoints."""
-from __future__ import annotations
 
 from datetime import date, timedelta
 
@@ -102,7 +101,6 @@ class TestCompleteSession:
     ):
         plan_id = draft_plan["id"]
 
-        # Add session
         sess_payload = {
             "name": "Day 1",
             "scheduled_date": (date.today() + timedelta(days=1)).isoformat(),
@@ -110,11 +108,9 @@ class TestCompleteSession:
         }
         plan = (await client.post(f"/plans/{plan_id}/sessions", json=sess_payload)).json()
 
-        # Activate
         plan = (await client.post(f"/plans/{plan_id}/activate")).json()
         assert plan["status"] == "ACTIVE"
 
-        # Complete session
         session_id = plan["sessions"][0]["id"]
         resp = await client.post(
             f"/plans/{plan_id}/sessions/{session_id}/complete",

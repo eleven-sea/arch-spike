@@ -1,17 +1,18 @@
-from __future__ import annotations
 
 import json
+from typing import override
 
-from domain.plans.events import PlanCompleted, SessionCompleted
 from application.core.events import IApplicationEventHandler
 from application.core.logger import ILogger
 from application.core.ports import IMessageBroker
+from domain.plans.events import PlanCompleted, SessionCompleted
 
 
 class SessionCompletedHandler(IApplicationEventHandler[SessionCompleted]):
     def __init__(self, app_logger: ILogger) -> None:
         self._log = app_logger.get_logger(__name__)
 
+    @override
     async def handle(self, event: SessionCompleted) -> None:
         self._log.info(
             "Session %s completed on plan %s at %s",
@@ -26,6 +27,7 @@ class PlanCompletedHandler(IApplicationEventHandler[PlanCompleted]):
         self._broker = broker
         self._log = app_logger.get_logger(__name__)
 
+    @override
     async def handle(self, event: PlanCompleted) -> None:
         payload = json.dumps(
             {

@@ -17,7 +17,6 @@ depends_on: str | Sequence[str] | None = None
 
 
 def upgrade() -> None:
-    # ── Members ──────────────────────────────────────────────────────────
     op.create_table(
         "members",
         sa.Column("id", sa.BigInteger(), autoincrement=True, nullable=False),
@@ -45,7 +44,6 @@ def upgrade() -> None:
         sa.PrimaryKeyConstraint("id"),
     )
 
-    # ── Coaches ───────────────────────────────────────────────────────────
     op.create_table(
         "coaches",
         sa.Column("id", sa.BigInteger(), autoincrement=True, nullable=False),
@@ -92,7 +90,6 @@ def upgrade() -> None:
         sa.PrimaryKeyConstraint("id"),
     )
 
-    # ── Training Plans ────────────────────────────────────────────────────
     op.create_table(
         "training_plans",
         sa.Column("id", sa.BigInteger(), autoincrement=True, nullable=False),

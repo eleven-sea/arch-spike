@@ -1,10 +1,12 @@
-from __future__ import annotations
-
-from datetime import date
 
 from domain.members.entities import FitnessGoal
 from domain.members.member import Member
-from domain.members.value_objects import FitnessLevel, GoalType, Membership, MembershipTier
+from domain.members.value_objects import (
+    FitnessLevel,
+    GoalType,
+    Membership,
+    MembershipTier,
+)
 from domain.shared.value_objects import Email, FullName, PhoneNumber
 from infrastructure.database.models.member_models import FitnessGoalORM, MemberORM
 
@@ -24,9 +26,9 @@ class MemberMapper:
         ]
         member = Member(
             id=orm.id,
-            name=FullName(orm.first_name, orm.last_name),
-            email=Email(orm.email),
-            phone=PhoneNumber(orm.phone),
+            name=FullName(first_name=orm.first_name, last_name=orm.last_name),
+            email=Email(value=orm.email),
+            phone=PhoneNumber(value=orm.phone),
             fitness_level=FitnessLevel(orm.fitness_level),
             membership=Membership(
                 tier=MembershipTier(orm.membership_tier),

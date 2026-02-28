@@ -1,7 +1,4 @@
 """E2E tests for /coaches endpoints."""
-from __future__ import annotations
-
-import pytest
 
 
 def _coach_payload(**overrides):
@@ -87,7 +84,6 @@ class TestMatchCoach:
     async def test_returns_best_coach_for_member(self, client):
         member = await self._register_member(client)
         await client.post("/coaches/", json=_coach_payload())
-        # Member has no goals → CoachMatchingService returns None (no goal→spec overlap)
         resp = await client.get(f"/coaches/match?member_id={member['id']}")
         assert resp.status_code == 200
 

@@ -1,9 +1,10 @@
-from __future__ import annotations
 
 from datetime import date, datetime
-from typing import Optional
+from typing import Self
 
 from pydantic import BaseModel
+
+from domain.plans.training_plan import TrainingPlan
 
 
 class ExerciseInput(BaseModel):
@@ -16,20 +17,20 @@ class ExerciseInput(BaseModel):
 
 class SessionCreate(BaseModel):
     name: str
-    scheduled_date: str  # ISO date string
+    scheduled_date: str
     exercises: list[ExerciseInput] = []
 
 
 class CompleteSession(BaseModel):
-    notes: Optional[str] = None
+    notes: str | None = None
 
 
 class PlanCreate(BaseModel):
     member_id: int
     coach_id: int
     name: str
-    starts_at: str  # ISO date string
-    ends_at: str    # ISO date string
+    starts_at: str
+    ends_at: str
 
 
 class PlannedExerciseResponse(BaseModel):
@@ -41,12 +42,12 @@ class PlannedExerciseResponse(BaseModel):
 
 
 class WorkoutSessionResponse(BaseModel):
-    id: Optional[int]
+    id: int | None
     name: str
     scheduled_date: date
     status: str
-    completed_at: Optional[datetime]
-    notes: Optional[str]
+    completed_at: datetime | None
+    notes: str | None
     exercises: list[PlannedExerciseResponse]
 
 
@@ -56,7 +57,7 @@ class PlanProgressResponse(BaseModel):
 
 
 class PlanResponse(BaseModel):
-    id: Optional[int]
+    id: int | None
     member_id: int
     coach_id: int
     name: str
@@ -66,7 +67,7 @@ class PlanResponse(BaseModel):
     sessions: list[WorkoutSessionResponse]
 
     @classmethod
-    def from_domain(cls, p) -> "PlanResponse":
+    def from_domain(cls, p: TrainingPlan) -> Self:
         return cls(
             id=p.id,
             member_id=p.member_id,

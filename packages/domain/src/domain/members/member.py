@@ -1,35 +1,32 @@
-from __future__ import annotations
 
-from dataclasses import dataclass, field
+from typing import Self
+
+from pydantic import BaseModel, PrivateAttr
 
 from domain.members.entities import FitnessGoal
 from domain.members.value_objects import (
     FitnessLevel,
-    GoalType,
     Membership,
     MembershipTier,
 )
+from domain.shared.events import ApplicationEvent
 from domain.shared.value_objects import Email, FullName, PhoneNumber
 
 FREE_MAX_GOALS = 2
 
 
-@dataclass
-class Member:
+class Member(BaseModel):
     name: FullName
     email: Email
     phone: PhoneNumber
     fitness_level: FitnessLevel
     membership: Membership
-    goals: list[FitnessGoal] = field(default_factory=list)
+    goals: list[FitnessGoal] = []
     active_plan_id: int | None = None
     id: int | None = None
 
-    _events: list = field(default_factory=list, repr=False, compare=False)
+    _events: list[ApplicationEvent] = PrivateAttr(default_factory=list)  # pyright: ignore[reportUnknownVariableType]
 
-    # ------------------------------------------------------------------
-    # Factory
-    # ------------------------------------------------------------------
     @classmethod
     def create(
         cls,
@@ -39,13 +36,13 @@ class Member:
         phone: str,
         fitness_level: FitnessLevel,
         membership: Membership,
-    ) -> "Member":
+    ) -> Self:
         from domain.members.events import MemberRegistered
 
         member = cls(
-            name=FullName(first_name, last_name),
-            email=Email(email),
-            phone=PhoneNumber(phone),
+            name=FullName(first_name=first_name, last_name=last_name),
+            email=Email(value=email),
+            phone=PhoneNumber(value=phone),
             fitness_level=fitness_level,
             membership=membership,
         )
@@ -58,9 +55,6 @@ class Member:
         )
         return member
 
-    # ------------------------------------------------------------------
-    # Invariants
-    # ------------------------------------------------------------------
     def _assert_goal_limit(self) -> None:
         if (
             self.membership.tier == MembershipTier.FREE
@@ -71,9 +65,6 @@ class Member:
                 "upgrade your membership to add more."
             )
 
-    # ------------------------------------------------------------------
-    # Behaviour
-    # ------------------------------------------------------------------
     def add_goal(self, goal: FitnessGoal) -> None:
         self._assert_goal_limit()
         self.goals.append(goal)
@@ -119,6 +110,6 @@ class Member:
     def clear_active_plan(self) -> None:
         self.active_plan_id = None
 
-    def pull_events(self) -> list:
+    def pull_events(self) -> list[ApplicationEvent]:
         events, self._events = self._events, []
         return events

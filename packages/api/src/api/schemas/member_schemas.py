@@ -1,9 +1,10 @@
-from __future__ import annotations
 
 from datetime import date
-from typing import Optional
+from typing import Self
 
 from pydantic import BaseModel
+
+from domain.members.member import Member
 
 
 class MemberCreate(BaseModel):
@@ -11,19 +12,19 @@ class MemberCreate(BaseModel):
     last_name: str
     email: str
     phone: str
-    fitness_level: str  # BEGINNER / INTERMEDIATE / ADVANCED
+    fitness_level: str
     membership_tier: str = "FREE"
-    membership_valid_until: Optional[str] = None  # ISO date string
+    membership_valid_until: str | None = None
 
 
 class GoalCreate(BaseModel):
-    goal_type: str       # LOSE_WEIGHT / BUILD_MUSCLE / ENDURANCE / FLEXIBILITY
+    goal_type: str
     description: str
-    target_date: str     # ISO date string
+    target_date: str
 
 
 class GoalResponse(BaseModel):
-    id: Optional[int]
+    id: int | None
     type: str
     description: str
     target_date: date
@@ -33,7 +34,7 @@ class GoalResponse(BaseModel):
 
 
 class MemberResponse(BaseModel):
-    id: Optional[int]
+    id: int | None
     first_name: str
     last_name: str
     email: str
@@ -41,13 +42,13 @@ class MemberResponse(BaseModel):
     fitness_level: str
     membership_tier: str
     membership_valid_until: date
-    active_plan_id: Optional[int]
+    active_plan_id: int | None
     goals: list[GoalResponse]
 
     model_config = {"from_attributes": True}
 
     @classmethod
-    def from_domain(cls, m) -> "MemberResponse":
+    def from_domain(cls, m: Member) -> Self:
         return cls(
             id=m.id,
             first_name=m.name.first_name,

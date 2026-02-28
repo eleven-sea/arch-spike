@@ -1,8 +1,6 @@
 """Integration tests — TrainingPlan aggregate against real PostgreSQL."""
-from __future__ import annotations
 
 from datetime import date, timedelta
-from unittest.mock import AsyncMock
 
 import pytest
 
@@ -38,7 +36,6 @@ class TestPlanIntegration:
         member = await _register_member(member_service)
         coach = await _register_coach(coach_service)
 
-        # Create plan
         plan = await plan_service.create_plan(
             member_id=member.id,
             coach_id=coach.id,
@@ -48,7 +45,6 @@ class TestPlanIntegration:
         )
         assert plan.status.value == "DRAFT"
 
-        # Add session (exercise client mocked via container override)
         plan = await plan_service.add_session(
             plan_id=plan.id,
             session_name="Day 1",
@@ -57,11 +53,9 @@ class TestPlanIntegration:
         )
         assert len(plan.sessions) == 1
 
-        # Activate
         plan = await plan_service.activate_plan(plan.id)
         assert plan.status.value == "ACTIVE"
 
-        # Complete session → triggers auto-complete
         session_id = plan.sessions[0].id
         plan = await plan_service.complete_session(plan.id, session_id)
         assert plan.sessions[0].status.value == "COMPLETED"

@@ -1,15 +1,16 @@
 import logging
 import sys
+from typing import override
 
 from application.core.logger import ILogger
 
 
 class ApplicationLogger(ILogger):
-    def __init__(self, level: int = logging.DEBUG):
+    def __init__(self, level: int = logging.DEBUG) -> None:
         self._level = level
         self._setup()
 
-    def _setup(self):
+    def _setup(self) -> None:
         root = logging.getLogger()
         root.setLevel(self._level)
 
@@ -23,6 +24,7 @@ class ApplicationLogger(ILogger):
             handler.setFormatter(formatter)
             root.addHandler(handler)
 
+    @override
     def get_logger(self, name: str) -> logging.Logger:
         logger = logging.getLogger(name)
         logger.setLevel(self._level)

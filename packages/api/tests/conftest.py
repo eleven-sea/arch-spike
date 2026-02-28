@@ -1,4 +1,3 @@
-from __future__ import annotations
 
 from unittest.mock import AsyncMock
 
@@ -7,8 +6,8 @@ import pytest
 import pytest_asyncio
 from sqlalchemy import text
 
-from bootstrap.context import ApplicationContext
 from api.main import create_api
+from bootstrap.context import ApiApplicationContext
 
 
 def _make_null_exercise_client():
@@ -20,12 +19,12 @@ def _make_null_exercise_client():
 
 @pytest_asyncio.fixture(scope="session", loop_scope="session")
 async def api_context(postgres_url, redis_url):
-    ctx = ApplicationContext()
+    ctx = ApiApplicationContext()
     ctx.container.config.database.url.override(postgres_url)
     ctx.container.config.redis.url.override(redis_url)
-    # IExerciseClient (WgerAdapter) uses an external HTTP API — mock it in tests
     ctx.container.wger_client.override(AsyncMock())
     ctx.container.exercise_client.override(_make_null_exercise_client())
+    ctx.container.task_dispatcher.override(AsyncMock())
     await ctx.start()
     yield ctx
     await ctx.stop()
@@ -53,6 +52,5 @@ async def _clean_db(api_context):
             "coach_spec_rows, availability_slots, certifications, coaches, "
             "fitness_goals, members RESTART IDENTITY CASCADE"
         ))
-    # Clear Redis cache between tests to prevent stale data
     redis_client = await api_context.container.redis_client.async_()
     await redis_client._redis.flushdb()

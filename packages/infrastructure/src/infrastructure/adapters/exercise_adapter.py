@@ -1,4 +1,5 @@
-from __future__ import annotations
+
+from typing import override
 
 from application.core.logger import ILogger
 from application.core.ports import IExerciseClient
@@ -10,18 +11,20 @@ class WgerAdapter(IExerciseClient):
         self._client = client
         self._log = app_logger.get_logger(__name__)
 
-    async def get_exercise(self, exercise_id: str) -> dict | None:
+    @override
+    async def get_exercise(self, exercise_id: str) -> dict[str, object] | None:
         try:
             response = await self._client.client.get(f"/exercise/{exercise_id}/")
             if response.status_code == 404:
                 return None
             response.raise_for_status()
-            return response.json()
+            return response.json()  # type: ignore[no-any-return]
         except Exception as exc:
             self._log.warning("wger get_exercise(%s) failed: %s", exercise_id, exc)
             return None
 
-    async def search_exercises(self, name: str) -> list[dict]:
+    @override
+    async def search_exercises(self, name: str) -> list[dict[str, object]]:
         try:
             response = await self._client.client.get(
                 "/exercise/search/",
@@ -30,7 +33,7 @@ class WgerAdapter(IExerciseClient):
             response.raise_for_status()
             data = response.json()
             suggestions = data.get("suggestions", [])
-            results = []
+            results: list[dict[str, object]] = []
             for s in suggestions:
                 results.append(
                     {

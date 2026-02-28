@@ -1,4 +1,3 @@
-from __future__ import annotations
 
 from domain.coaches.coach import Coach
 from domain.coaches.entities import AvailabilitySlot, Certification
@@ -40,8 +39,8 @@ class CoachMapper:
         )
         return Coach(
             id=orm.id,
-            name=FullName(orm.first_name, orm.last_name),
-            email=Email(orm.email),
+            name=FullName(first_name=orm.first_name, last_name=orm.last_name),
+            email=Email(value=orm.email),
             bio=orm.bio,
             tier=CoachTier(orm.tier),
             specializations=specs,

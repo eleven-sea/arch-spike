@@ -5,6 +5,7 @@ requires-python = ">=3.12"
 dependencies = [
     "application",
     "bootstrap",
+    "domain",
     "dependency-injector>=4.41",
     "fastapi>=0.115",
     "starlette>=0.52",
@@ -22,3 +23,4 @@ packages = ["src/api"]
 [tool.uv.sources]
 application = { workspace = true }
 bootstrap = { workspace = true }
+domain = { workspace = true }

@@ -1,16 +1,15 @@
-from __future__ import annotations
 
-from dataclasses import dataclass, field
-from datetime import date, datetime
+from datetime import UTC, date, datetime
+
+from pydantic import BaseModel
 
 from domain.plans.value_objects import PlannedExercise, SessionId, SessionStatus
 
 
-@dataclass
-class WorkoutSession:
+class WorkoutSession(BaseModel):
     name: str
     scheduled_date: date
-    exercises: list[PlannedExercise] = field(default_factory=list)
+    exercises: list[PlannedExercise] = []
     status: SessionStatus = SessionStatus.PENDING
     completed_at: datetime | None = None
     notes: str | None = None
@@ -22,7 +21,7 @@ class WorkoutSession:
                 f"Cannot complete session with status {self.status.value}"
             )
         self.status = SessionStatus.COMPLETED
-        self.completed_at = datetime.utcnow()
+        self.completed_at = datetime.now(UTC)
         if notes is not None:
             self.notes = notes
 

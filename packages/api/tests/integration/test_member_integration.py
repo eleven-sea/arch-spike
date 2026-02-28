@@ -1,5 +1,4 @@
 """Integration tests — Member aggregate against real PostgreSQL."""
-from __future__ import annotations
 
 from datetime import date, timedelta
 

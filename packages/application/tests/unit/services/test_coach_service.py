@@ -1,5 +1,4 @@
 """Unit tests for CoachService."""
-from __future__ import annotations
 
 from datetime import date, timedelta
 
@@ -78,14 +77,15 @@ class TestFindAvailable:
             [
                 {
                     "id": 99,
-                    "first_name": "Cached",
-                    "last_name": "Coach",
-                    "email": "cached@gym.com",
+                    "name": {"first_name": "Cached", "last_name": "Coach"},
+                    "email": {"value": "cached@gym.com"},
                     "bio": "",
                     "tier": "STANDARD",
                     "specializations": ["STRENGTH"],
                     "max_clients": 5,
                     "current_client_count": 0,
+                    "certifications": [],
+                    "available_slots": [],
                 }
             ]
         )
@@ -99,11 +99,8 @@ class TestFindBestForMember:
         self, coach_service, member_repo, fake_cache
     ):
         member = await _register_member(member_repo)
-        # BEGINNER with no goals — any STANDARD coach with capacity is a candidate
-        # but CoachMatchingService needs overlapping specs with member goals.
-        # Add a goal so matching works.
-        from domain.members.value_objects import GoalType
         from domain.members.entities import FitnessGoal
+        from domain.members.value_objects import GoalType
 
         member.goals.append(
             FitnessGoal(
@@ -114,13 +111,12 @@ class TestFindBestForMember:
         )
         await member_repo.save(member)
 
-        await _register(coach_service)  # STRENGTH + CARDIO coach
+        await _register(coach_service)
         coach = await coach_service.find_best_for_member(member.id)
         assert coach is not None
 
     async def test_returns_none_when_no_match(self, coach_service, member_repo):
         member = await _register_member(member_repo)
-        # No coaches registered → no match
         result = await coach_service.find_best_for_member(member.id)
         assert result is None
 

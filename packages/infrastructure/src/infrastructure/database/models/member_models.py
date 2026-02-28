@@ -1,7 +1,5 @@
-from __future__ import annotations
 
 from datetime import date
-from typing import List, Optional
 
 from sqlalchemy import BigInteger, Boolean, Date, ForeignKey, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -31,9 +29,9 @@ class MemberORM(Base):
     fitness_level: Mapped[str] = mapped_column(String(20), nullable=False)
     membership_tier: Mapped[str] = mapped_column(String(20), nullable=False)
     membership_valid_until: Mapped[date] = mapped_column(Date, nullable=False)
-    active_plan_id: Mapped[Optional[int]] = mapped_column(BigInteger, nullable=True)
+    active_plan_id: Mapped[int | None] = mapped_column(BigInteger, nullable=True)
 
-    goals: Mapped[List[FitnessGoalORM]] = relationship(
+    goals: Mapped[list[FitnessGoalORM]] = relationship(
         "FitnessGoalORM",
         cascade="all, delete-orphan",
         lazy="selectin",

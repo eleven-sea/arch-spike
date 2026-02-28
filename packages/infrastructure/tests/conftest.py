@@ -2,10 +2,10 @@ import pytest
 import pytest_asyncio
 from sqlalchemy import text
 
-from infrastructure.database.session import Database
-from infrastructure.database.migrations import run_migrations
 from infrastructure.database.base_repository import BaseRepository
+from infrastructure.database.migrations import run_migrations
 from infrastructure.database.models.member_models import MemberORM
+from infrastructure.database.session import Database
 
 
 @pytest_asyncio.fixture(scope="session", loop_scope="session")

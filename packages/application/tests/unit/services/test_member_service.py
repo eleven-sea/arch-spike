@@ -1,5 +1,4 @@
 """Unit tests for MemberService."""
-from __future__ import annotations
 
 from datetime import date, timedelta
 
@@ -9,11 +8,12 @@ from application.members.member_service import MemberService
 
 
 @pytest.fixture()
-def member_service(member_repo, fake_dispatcher, fake_logger):
+def member_service(member_repo, fake_dispatcher, fake_logger, fake_task_dispatcher):
     return MemberService(
         member_repo=member_repo,
         dispatcher=fake_dispatcher,
         app_logger=fake_logger,
+        task_dispatcher=fake_task_dispatcher,
     )
 
 

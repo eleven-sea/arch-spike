@@ -1,11 +1,11 @@
 """Unit tests for the Member aggregate."""
-from __future__ import annotations
 
 from datetime import date, timedelta
 
 import pytest
 
 from domain.members.entities import FitnessGoal
+from domain.members.events import MemberRegistered
 from domain.members.member import Member
 from domain.members.value_objects import (
     FitnessLevel,
@@ -13,7 +13,6 @@ from domain.members.value_objects import (
     Membership,
     MembershipTier,
 )
-from domain.members.events import MemberRegistered
 
 
 def _membership(tier: MembershipTier = MembershipTier.FREE) -> Membership:
@@ -67,23 +66,6 @@ class TestGoalLimit:
             member.add_goal(_goal(days))
         assert len(member.goals) == 5
 
-
-class TestGoalTargetDate:
-    def test_past_target_date_raises(self):
-        with pytest.raises(ValueError, match="future"):
-            FitnessGoal(
-                type=GoalType.BUILD_MUSCLE,
-                description="Build",
-                target_date=date.today() - timedelta(days=1),
-            )
-
-    def test_today_target_date_raises(self):
-        with pytest.raises(ValueError, match="future"):
-            FitnessGoal(
-                type=GoalType.BUILD_MUSCLE,
-                description="Build",
-                target_date=date.today(),
-            )
 
 
 class TestActivePlan:

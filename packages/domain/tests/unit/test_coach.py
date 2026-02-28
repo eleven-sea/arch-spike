@@ -1,11 +1,10 @@
 """Unit tests for the Coach aggregate."""
-from __future__ import annotations
 
 import pytest
 
 from domain.coaches.coach import Coach
-from domain.coaches.value_objects import CoachTier, Specialization
 from domain.coaches.events import CoachRegistered
+from domain.coaches.value_objects import CoachTier, Specialization
 from domain.members.value_objects import MembershipTier
 
 

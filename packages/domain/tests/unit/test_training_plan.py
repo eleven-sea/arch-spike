@@ -1,14 +1,18 @@
 """Unit tests for the TrainingPlan aggregate."""
-from __future__ import annotations
 
 from datetime import date, timedelta
 
 import pytest
 
 from domain.plans.entities import WorkoutSession
-from domain.plans.events import PlanActivated, PlanCompleted, PlanCreated, SessionCompleted
+from domain.plans.events import (
+    PlanActivated,
+    PlanCompleted,
+    PlanCreated,
+    SessionCompleted,
+)
 from domain.plans.training_plan import TrainingPlan
-from domain.plans.value_objects import PlanStatus, PlannedExercise, SessionStatus
+from domain.plans.value_objects import PlannedExercise, PlanStatus, SessionStatus
 
 
 def _plan(member_id: int = 1, coach_id: int = 1) -> TrainingPlan:

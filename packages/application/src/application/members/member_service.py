@@ -1,13 +1,16 @@
-from __future__ import annotations
 
-import logging
-
+from application.core.events import IEventDispatcher
+from application.core.logger import ILogger
+from application.core.ports import IAsyncTaskDispatcher
 from domain.members.entities import FitnessGoal
 from domain.members.member import Member
 from domain.members.repositories import IMemberRepository
-from domain.members.value_objects import FitnessLevel, GoalType, Membership, MembershipTier
-from application.core.events import IEventDispatcher
-from application.core.logger import ILogger
+from domain.members.value_objects import (
+    FitnessLevel,
+    GoalType,
+    Membership,
+    MembershipTier,
+)
 
 
 class MemberService:
@@ -16,10 +19,12 @@ class MemberService:
         member_repo: IMemberRepository,
         dispatcher: IEventDispatcher,
         app_logger: ILogger,
+        task_dispatcher: IAsyncTaskDispatcher,
     ) -> None:
         self._repo = member_repo
         self._dispatcher = dispatcher
         self._logger = app_logger
+        self._task_dispatcher = task_dispatcher
 
     async def register(
         self,
@@ -59,6 +64,11 @@ class MemberService:
 
         for event in member.pull_events():
             self._dispatcher.run_in_background(event)
+
+        await self._task_dispatcher.dispatch(
+            "worker.tasks.member_tasks.log_member_activity",
+            member_id=saved.id,
+        )
 
         return saved
 

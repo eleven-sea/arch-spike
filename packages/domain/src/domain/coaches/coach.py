@@ -1,15 +1,16 @@
-from __future__ import annotations
 
-from dataclasses import dataclass, field
+from typing import Self
+
+from pydantic import BaseModel, PrivateAttr
 
 from domain.coaches.entities import AvailabilitySlot, Certification
 from domain.coaches.value_objects import CoachTier, Specialization
 from domain.members.value_objects import MembershipTier
+from domain.shared.events import ApplicationEvent
 from domain.shared.value_objects import Email, FullName
 
 
-@dataclass
-class Coach:
+class Coach(BaseModel):
     name: FullName
     email: Email
     bio: str
@@ -17,11 +18,11 @@ class Coach:
     specializations: frozenset[Specialization]
     max_clients: int
     current_client_count: int = 0
-    certifications: list[Certification] = field(default_factory=list)
-    available_slots: list[AvailabilitySlot] = field(default_factory=list)
+    certifications: list[Certification] = []
+    available_slots: list[AvailabilitySlot] = []
     id: int | None = None
 
-    _events: list = field(default_factory=list, repr=False, compare=False)
+    _events: list[ApplicationEvent] = PrivateAttr(default_factory=list)  # pyright: ignore[reportUnknownVariableType]
 
     @classmethod
     def create(
@@ -33,12 +34,12 @@ class Coach:
         tier: CoachTier,
         specializations: frozenset[Specialization],
         max_clients: int,
-    ) -> "Coach":
+    ) -> Self:
         from domain.coaches.events import CoachRegistered
 
         coach = cls(
-            name=FullName(first_name, last_name),
-            email=Email(email),
+            name=FullName(first_name=first_name, last_name=last_name),
+            email=Email(value=email),
             bio=bio,
             tier=tier,
             specializations=specializations,
@@ -75,6 +76,6 @@ class Coach:
     def add_availability_slot(self, slot: AvailabilitySlot) -> None:
         self.available_slots.append(slot)
 
-    def pull_events(self) -> list:
+    def pull_events(self) -> list[ApplicationEvent]:
         events, self._events = self._events, []
         return events

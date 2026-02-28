@@ -1,5 +1,4 @@
 """Tests for BaseRepository using MemberORM as the concrete model."""
-from __future__ import annotations
 
 from datetime import date, timedelta
 

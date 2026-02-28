@@ -2,7 +2,12 @@ import logging
 from contextlib import asynccontextmanager
 from contextvars import ContextVar
 
-from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine, AsyncEngine
+from sqlalchemy.ext.asyncio import (
+    AsyncEngine,
+    AsyncSession,
+    async_sessionmaker,
+    create_async_engine,
+)
 
 _current_session: ContextVar[AsyncSession | None] = ContextVar("_current_session", default=None)
 _logger = logging.getLogger(__name__)

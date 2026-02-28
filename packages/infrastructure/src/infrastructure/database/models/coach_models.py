@@ -1,7 +1,5 @@
-from __future__ import annotations
 
 from datetime import date
-from typing import List, Optional
 
 from sqlalchemy import BigInteger, Date, ForeignKey, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -17,7 +15,7 @@ class CertificationORM(Base):
     name: Mapped[str] = mapped_column(String(200), nullable=False)
     issuing_body: Mapped[str] = mapped_column(String(200), nullable=False)
     issued_at: Mapped[date] = mapped_column(Date, nullable=False)
-    expires_at: Mapped[Optional[date]] = mapped_column(Date, nullable=True)
+    expires_at: Mapped[date | None] = mapped_column(Date, nullable=True)
 
 
 class AvailabilitySlotORM(Base):
@@ -51,17 +49,17 @@ class CoachORM(Base):
     max_clients: Mapped[int] = mapped_column(Integer, nullable=False, default=10)
     current_client_count: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
 
-    certifications: Mapped[List[CertificationORM]] = relationship(
+    certifications: Mapped[list[CertificationORM]] = relationship(
         "CertificationORM",
         cascade="all, delete-orphan",
         lazy="selectin",
     )
-    available_slots: Mapped[List[AvailabilitySlotORM]] = relationship(
+    available_slots: Mapped[list[AvailabilitySlotORM]] = relationship(
         "AvailabilitySlotORM",
         cascade="all, delete-orphan",
         lazy="selectin",
     )
-    specializations: Mapped[List[CoachSpecializationORM]] = relationship(
+    specializations: Mapped[list[CoachSpecializationORM]] = relationship(
         "CoachSpecializationORM",
         cascade="all, delete-orphan",
         lazy="selectin",

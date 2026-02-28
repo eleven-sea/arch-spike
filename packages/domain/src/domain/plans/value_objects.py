@@ -1,27 +1,28 @@
-from __future__ import annotations
 
-from dataclasses import dataclass
-from enum import Enum
+from enum import StrEnum
+
+from pydantic import BaseModel, ConfigDict
 
 PlanId = int
 SessionId = int
 
 
-class PlanStatus(str, Enum):
+class PlanStatus(StrEnum):
     DRAFT = "DRAFT"
     ACTIVE = "ACTIVE"
     COMPLETED = "COMPLETED"
     CANCELLED = "CANCELLED"
 
 
-class SessionStatus(str, Enum):
+class SessionStatus(StrEnum):
     PENDING = "PENDING"
     COMPLETED = "COMPLETED"
     SKIPPED = "SKIPPED"
 
 
-@dataclass(frozen=True)
-class PlannedExercise:
+class PlannedExercise(BaseModel):
+    model_config = ConfigDict(frozen=True)
+
     exercise_id: str
     name: str
     sets: int

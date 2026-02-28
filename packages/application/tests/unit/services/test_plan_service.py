@@ -1,5 +1,4 @@
 """Unit tests for TrainingPlanService."""
-from __future__ import annotations
 
 from datetime import date, timedelta
 
@@ -26,9 +25,9 @@ async def _make_member(member_repo) -> Member:
     from domain.shared.value_objects import Email, FullName, PhoneNumber
 
     member = Member(
-        name=FullName("Jan", "Kowalski"),
-        email=Email("jan@test.com"),
-        phone=PhoneNumber("+48123456789"),
+        name=FullName(first_name="Jan", last_name="Kowalski"),
+        email=Email(value="jan@test.com"),
+        phone=PhoneNumber(value="+48123456789"),
         fitness_level=FitnessLevel.BEGINNER,
         membership=Membership(
             tier=MembershipTier.FREE,
@@ -117,7 +116,6 @@ class TestAddSession:
             scheduled_date=(date.today() + timedelta(days=1)).isoformat(),
             exercises=[{"name": "Squat", "sets": 3, "reps": 10, "rest_seconds": 60}],
         )
-        # With cache hit, no exercise client call
         fake_exercise_client.search_exercises.assert_not_called()
 
 

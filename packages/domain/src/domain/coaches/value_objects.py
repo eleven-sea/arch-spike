@@ -1,18 +1,17 @@
-from __future__ import annotations
 
-from enum import Enum
+from enum import StrEnum
 
 CoachId = int
 CertId = int
 SlotId = int
 
 
-class CoachTier(str, Enum):
+class CoachTier(StrEnum):
     STANDARD = "STANDARD"
     VIP = "VIP"
 
 
-class Specialization(str, Enum):
+class Specialization(StrEnum):
     STRENGTH = "STRENGTH"
     CARDIO = "CARDIO"
     YOGA = "YOGA"
@@ -20,7 +19,7 @@ class Specialization(str, Enum):
     NUTRITION = "NUTRITION"
 
 
-class Weekday(str, Enum):
+class Weekday(StrEnum):
     MON = "MON"
     TUE = "TUE"
     WED = "WED"

@@ -1,34 +1,35 @@
-from __future__ import annotations
 
-from dataclasses import dataclass
 from datetime import date
-from enum import Enum
+from enum import StrEnum
+
+from pydantic import BaseModel, ConfigDict
 
 MemberId = int
 GoalId = int
 
 
-class FitnessLevel(str, Enum):
+class FitnessLevel(StrEnum):
     BEGINNER = "BEGINNER"
     INTERMEDIATE = "INTERMEDIATE"
     ADVANCED = "ADVANCED"
 
 
-class MembershipTier(str, Enum):
+class MembershipTier(StrEnum):
     FREE = "FREE"
     PREMIUM = "PREMIUM"
     VIP = "VIP"
 
 
-class GoalType(str, Enum):
+class GoalType(StrEnum):
     LOSE_WEIGHT = "LOSE_WEIGHT"
     BUILD_MUSCLE = "BUILD_MUSCLE"
     ENDURANCE = "ENDURANCE"
     FLEXIBILITY = "FLEXIBILITY"
 
 
-@dataclass(frozen=True)
-class Membership:
+class Membership(BaseModel):
+    model_config = ConfigDict(frozen=True)
+
     tier: MembershipTier
     valid_until: date
 

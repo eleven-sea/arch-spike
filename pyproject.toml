@@ -8,6 +8,8 @@ dependencies = [
     "application",
     "bootstrap",
     "api",
+    "worker",
+    "pydantic>=2",
 ]
 
 [dependency-groups]
@@ -16,6 +18,8 @@ dev = [
     "pytest-asyncio>=0.24",
     "testcontainers[postgres,redis]>=4.0",
     "httpx>=0.27",
+    "pyright>=1.1.408",
+    "ruff>=0.15.4",
 ]
 
 [tool.uv.workspace]
@@ -25,6 +29,7 @@ members = [
     "packages/application",
     "packages/bootstrap",
     "packages/api",
+    "packages/worker",
 ]
 
 [tool.uv.sources]
@@ -33,6 +38,55 @@ infrastructure = { workspace = true }
 application = { workspace = true }
 bootstrap = { workspace = true }
 api = { workspace = true }
+worker = { workspace = true }
+
+[tool.pyright]
+pythonVersion = "3.12"
+pythonPlatform = "All"
+typeCheckingMode = "strict"
+venvPath = "."
+venv = ".venv"
+extraPaths = [
+    "packages/domain/src",
+    "packages/application/src",
+    "packages/infrastructure/src",
+    "packages/bootstrap/src",
+    "packages/api/src",
+    "packages/worker/src",
+]
+include = [
+    "packages/domain/src",
+    "packages/application/src",
+    "packages/infrastructure/src",
+    "packages/bootstrap/src",
+    "packages/api/src",
+    "packages/worker/src",
+]
+exclude = [
+    "**/tests/**",
+    "conftest.py",
+]
+# Biblioteki bez typed stubs (testcontainers, dependency-injector, taskiq, itp.)
+reportMissingTypeStubs = false
+reportMissingModuleSource = false
+# Nasze wymuszenia
+reportImplicitOverride = "error"
+
+[tool.ruff]
+target-version = "py312"
+src = ["packages/*/src"]
+line-length = 140
+
+[tool.ruff.lint]
+select = [
+    "E",    # pycodestyle errors
+    "W",    # pycodestyle warnings
+    "F",    # pyflakes
+    "UP",   # pyupgrade — enforces Python 3.12+ syntax
+    "I",    # isort
+    "FURB", # refurb — modernization
+    "RUF",  # ruff-specific rules
+]
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"

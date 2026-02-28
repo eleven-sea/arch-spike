@@ -1,16 +1,15 @@
-from __future__ import annotations
 
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from bootstrap.context import ApplicationContext
-from api.routers import members, coaches, plans
+from api.routers import coaches, members, plans
+from bootstrap.context import ApiApplicationContext
 
 
-def create_api(ctx: ApplicationContext | None = None) -> FastAPI:
-    ctx = ctx or ApplicationContext()
+def create_api(ctx: ApiApplicationContext | None = None) -> FastAPI:
+    ctx = ctx or ApiApplicationContext()
 
     @asynccontextmanager
     async def lifespan(app: FastAPI):

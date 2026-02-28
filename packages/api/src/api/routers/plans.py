@@ -1,10 +1,7 @@
-from __future__ import annotations
 
+from dependency_injector.wiring import Provide, inject
 from fastapi import APIRouter, Depends, HTTPException
-from dependency_injector.wiring import inject, Provide
 
-from bootstrap.containers import Container
-from application.plans.plan_service import TrainingPlanService
 from api.schemas.plan_schemas import (
     CompleteSession,
     PlanCreate,
@@ -12,6 +9,8 @@ from api.schemas.plan_schemas import (
     PlanResponse,
     SessionCreate,
 )
+from application.plans.plan_service import TrainingPlanService
+from bootstrap.containers import Container
 
 router = APIRouter(prefix="/plans", tags=["plans"])
 

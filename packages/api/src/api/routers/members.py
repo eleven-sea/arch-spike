@@ -1,11 +1,10 @@
-from __future__ import annotations
 
+from dependency_injector.wiring import Provide, inject
 from fastapi import APIRouter, Depends, HTTPException
-from dependency_injector.wiring import inject, Provide
 
-from bootstrap.containers import Container
-from application.members.member_service import MemberService
 from api.schemas.member_schemas import GoalCreate, MemberCreate, MemberResponse
+from application.members.member_service import MemberService
+from bootstrap.containers import Container
 
 router = APIRouter(prefix="/members", tags=["members"])
 

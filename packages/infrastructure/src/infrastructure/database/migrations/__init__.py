@@ -11,7 +11,7 @@ async def run_migrations(engine: AsyncEngine) -> None:
         "script_location", str(Path(__file__).resolve().parent)
     )
 
-    def _run(connection):
+    def _run(connection: object) -> None:
         alembic_cfg.attributes["connection"] = connection
         command.upgrade(alembic_cfg, "head")
 

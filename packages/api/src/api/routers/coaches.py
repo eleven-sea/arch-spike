@@ -1,13 +1,10 @@
-from __future__ import annotations
 
-from typing import Optional
-
+from dependency_injector.wiring import Provide, inject
 from fastapi import APIRouter, Depends, HTTPException, Query
-from dependency_injector.wiring import inject, Provide
 
-from bootstrap.containers import Container
-from application.coaches.coach_service import CoachService
 from api.schemas.coach_schemas import CoachCreate, CoachResponse
+from application.coaches.coach_service import CoachService
+from bootstrap.containers import Container
 
 router = APIRouter(prefix="/coaches", tags=["coaches"])
 
@@ -36,20 +33,19 @@ async def register_coach(
 @router.get("/", response_model=list[CoachResponse])
 @inject
 async def list_coaches(
-    specialization: Optional[str] = Query(None),
+    specialization: str | None = Query(None),
     coach_service: CoachService = Depends(Provide[Container.coach_service]),
 ) -> list[CoachResponse]:
     coaches = await coach_service.find_available(specialization)
     return [CoachResponse.from_domain(c) for c in coaches]
 
 
-# NOTE: /match must be declared before /{coach_id} so FastAPI routes it correctly
-@router.get("/match", response_model=Optional[CoachResponse])
+@router.get("/match", response_model=CoachResponse | None)
 @inject
 async def match_coach_for_member(
     member_id: int = Query(...),
     coach_service: CoachService = Depends(Provide[Container.coach_service]),
-) -> Optional[CoachResponse]:
+) -> CoachResponse | None:
     try:
         coach = await coach_service.find_best_for_member(member_id)
     except ValueError as exc:

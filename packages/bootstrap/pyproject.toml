@@ -3,6 +3,7 @@ name = "bootstrap"
 version = "0.1.0"
 requires-python = ">=3.12"
 dependencies = [
+    "domain",
     "application",
     "infrastructure",
     "dependency-injector>=4.41",
@@ -16,5 +17,6 @@ build-backend = "hatchling.build"
 packages = ["src/bootstrap"]
 
 [tool.uv.sources]
+domain = { workspace = true }
 application = { workspace = true }
 infrastructure = { workspace = true }

@@ -1,11 +1,11 @@
-from __future__ import annotations
 
 import json
+from typing import override
 
-from domain.members.events import MemberRegistered
 from application.core.events import IApplicationEventHandler
 from application.core.logger import ILogger
 from application.core.ports import IMessageBroker
+from domain.members.events import MemberRegistered
 
 
 class MemberRegisteredHandler(IApplicationEventHandler[MemberRegistered]):
@@ -13,6 +13,7 @@ class MemberRegisteredHandler(IApplicationEventHandler[MemberRegistered]):
         self._broker = broker
         self._log = app_logger.get_logger(__name__)
 
+    @override
     async def handle(self, event: MemberRegistered) -> None:
         payload = json.dumps(
             {

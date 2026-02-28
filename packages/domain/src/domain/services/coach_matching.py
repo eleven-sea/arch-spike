@@ -1,4 +1,3 @@
-from __future__ import annotations
 
 from domain.coaches.coach import Coach
 from domain.coaches.value_objects import Specialization

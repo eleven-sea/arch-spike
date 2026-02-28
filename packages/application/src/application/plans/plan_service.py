@@ -1,17 +1,16 @@
-from __future__ import annotations
 
 import json
 from datetime import date
 
+from application.core.events import IEventDispatcher
+from application.core.logger import ILogger
+from application.core.ports import ICache, IExerciseClient
 from domain.members.repositories import IMemberRepository
 from domain.plans.entities import WorkoutSession
 from domain.plans.repositories import ITrainingPlanRepository
 from domain.plans.training_plan import TrainingPlan
 from domain.plans.value_objects import PlannedExercise
 from domain.services.plan_progress import PlanProgressService
-from application.core.events import IEventDispatcher
-from application.core.logger import ILogger
-from application.core.ports import ICache, IExerciseClient
 
 _EXERCISE_TTL = 3600  # 1 hour
 
@@ -74,7 +73,6 @@ class TrainingPlanService:
         plan.activate()
         saved = await self._plan_repo.save(plan)
 
-        # Update member's active_plan_id
         member = await self._member_repo.get_by_id(plan.member_id)
         if member:
             member.assign_plan(plan_id)
@@ -90,7 +88,7 @@ class TrainingPlanService:
         plan_id: int,
         session_name: str,
         scheduled_date: str,
-        exercises: list[dict],
+        exercises: list[dict[str, object]],
     ) -> TrainingPlan:
         """Add a workout session with exercises (looked up / cached from wger)."""
         plan = await self._plan_repo.get_by_id(plan_id)
@@ -99,11 +97,11 @@ class TrainingPlanService:
 
         planned_exercises: list[PlannedExercise] = []
         for ex in exercises:
-            ex_name = ex.get("name", "Unknown")
+            ex_name = str(ex.get("name", "Unknown"))
             cache_key = f"exercise:{ex_name.lower()}"
             cached = await self._cache.get(cache_key)
             if cached is not None:
-                ex_data = json.loads(cached)
+                ex_data: dict[str, object] = json.loads(cached)
             else:
                 results = await self._exercise_client.search_exercises(ex_name)
                 ex_data = results[0] if results else {"exercise_id": "0", "name": ex_name}
@@ -112,10 +110,10 @@ class TrainingPlanService:
             planned_exercises.append(
                 PlannedExercise(
                     exercise_id=str(ex_data.get("exercise_id", ex.get("exercise_id", "0"))),
-                    name=ex_data.get("name", ex_name),
-                    sets=ex.get("sets", 3),
-                    reps=ex.get("reps", 10),
-                    rest_seconds=ex.get("rest_seconds", 60),
+                    name=str(ex_data.get("name", ex_name)),
+                    sets=int(ex.get("sets", 3)),  # type: ignore[arg-type]
+                    reps=int(ex.get("reps", 10)),  # type: ignore[arg-type]
+                    rest_seconds=int(ex.get("rest_seconds", 60)),  # type: ignore[arg-type]
                 )
             )
 

@@ -1,9 +1,9 @@
-from __future__ import annotations
 
-from datetime import date
-from typing import Optional
+from typing import Self
 
 from pydantic import BaseModel
+
+from domain.coaches.coach import Coach
 
 
 class CoachCreate(BaseModel):
@@ -11,13 +11,13 @@ class CoachCreate(BaseModel):
     last_name: str
     email: str
     bio: str = ""
-    tier: str = "STANDARD"           # STANDARD / VIP
-    specializations: list[str] = []  # STRENGTH / CARDIO / YOGA / CROSSFIT / NUTRITION
+    tier: str = "STANDARD"
+    specializations: list[str] = []
     max_clients: int = 10
 
 
 class CoachResponse(BaseModel):
-    id: Optional[int]
+    id: int | None
     first_name: str
     last_name: str
     email: str
@@ -30,7 +30,7 @@ class CoachResponse(BaseModel):
     model_config = {"from_attributes": True}
 
     @classmethod
-    def from_domain(cls, c) -> "CoachResponse":
+    def from_domain(cls, c: Coach) -> Self:
         return cls(
             id=c.id,
             first_name=c.name.first_name,
