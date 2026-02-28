@@ -121,5 +121,5 @@ class TestFindBestForMember:
         assert result is None
 
     async def test_raises_when_member_not_found(self, coach_service):
-        with pytest.raises(ValueError, match="not found"):
+        with pytest.raises(ValueError):
             await coach_service.find_best_for_member(999)

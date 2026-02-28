@@ -5,6 +5,7 @@ from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from infrastructure.database.base import Base
+from infrastructure.database.exceptions import EntityNotFoundException
 
 type SessionFactory = Callable[[], AbstractAsyncContextManager[AsyncSession]]
 
@@ -23,17 +24,32 @@ class BaseRepository[T: Base, ID]:
             result = await session.execute(select(self._model))
             return list(result.scalars().all())
 
+    async def get_by_id(self, id: ID) -> T:
+        r = await self.find_by_id(id)
+        if r is None:
+            raise EntityNotFoundException(self._model.__name__, id)
+        return r
+
     async def save(self, entity: T) -> T:
         async with self._session_factory() as session:
-            merged = await session.merge(entity)
+            if entity.is_new:
+                session.add(entity)
+            else:
+                entity = await session.merge(entity)
             await session.flush()
-            return merged
+            return entity
 
     async def save_all(self, entities: list[T]) -> list[T]:
         async with self._session_factory() as session:
-            merged = [await session.merge(e) for e in entities]
+            result: list[T] = []
+            for entity in entities:
+                if entity.is_new:
+                    session.add(entity)
+                    result.append(entity)
+                else:
+                    result.append(await session.merge(entity))
             await session.flush()
-            return merged
+            return result
 
     async def delete(self, id: ID) -> None:
         async with self._session_factory() as session:

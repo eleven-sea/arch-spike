@@ -88,8 +88,6 @@ class MemberService:
         from datetime import date
 
         member = await self._repo.get_by_id(member_id)
-        if member is None:
-            raise ValueError(f"Member {member_id} not found")
 
         goal = FitnessGoal(
             type=GoalType(goal_type),
@@ -106,8 +104,6 @@ class MemberService:
 
     async def achieve_goal(self, member_id: int, goal_id: int) -> Member:
         member = await self._repo.get_by_id(member_id)
-        if member is None:
-            raise ValueError(f"Member {member_id} not found")
 
         member.achieve_goal(goal_id)
         saved = await self._repo.save(member)

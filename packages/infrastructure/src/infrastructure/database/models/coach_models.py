@@ -1,5 +1,5 @@
-
 from datetime import date
+from typing import override
 
 from sqlalchemy import BigInteger, Date, ForeignKey, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -17,6 +17,11 @@ class CertificationORM(Base):
     issued_at: Mapped[date] = mapped_column(Date, nullable=False)
     expires_at: Mapped[date | None] = mapped_column(Date, nullable=True)
 
+    @property
+    @override
+    def is_new(self) -> bool:
+        return self.id is None  # pyright: ignore[reportUnnecessaryComparison]
+
 
 class AvailabilitySlotORM(Base):
     __tablename__ = "availability_slots"
@@ -27,14 +32,23 @@ class AvailabilitySlotORM(Base):
     start_hour: Mapped[int] = mapped_column(Integer, nullable=False)
     end_hour: Mapped[int] = mapped_column(Integer, nullable=False)
 
+    @property
+    @override
+    def is_new(self) -> bool:
+        return self.id is None  # pyright: ignore[reportUnnecessaryComparison]
+
 
 class CoachSpecializationORM(Base):
-    """Stores each specialization as a separate row."""
     __tablename__ = "coach_spec_rows"
 
     id: Mapped[int] = mapped_column(BigInteger, primary_key=True, autoincrement=True)
     coach_id: Mapped[int] = mapped_column(BigInteger, ForeignKey("coaches.id", ondelete="CASCADE"), nullable=False)
     specialization: Mapped[str] = mapped_column(String(30), nullable=False)
+
+    @property
+    @override
+    def is_new(self) -> bool:
+        return self.id is None  # pyright: ignore[reportUnnecessaryComparison]
 
 
 class CoachORM(Base):
@@ -64,3 +78,8 @@ class CoachORM(Base):
         cascade="all, delete-orphan",
         lazy="selectin",
     )
+
+    @property
+    @override
+    def is_new(self) -> bool:
+        return self.id is None  # pyright: ignore[reportUnnecessaryComparison]

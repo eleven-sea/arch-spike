@@ -7,7 +7,6 @@ Run with:
 
 from taskiq import TaskiqEvents, TaskiqState
 
-import worker.tasks.member_tasks  # noqa: F401  # pyright: ignore[reportUnusedImport]
 from bootstrap.context import WorkerApplicationContext
 from infrastructure.taskiq.broker import broker
 

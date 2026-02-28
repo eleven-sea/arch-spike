@@ -4,6 +4,8 @@ from datetime import date, timedelta
 
 import pytest
 
+from infrastructure.database.exceptions import EntityNotFoundException
+
 
 async def _register(svc, email: str = "jan@test.com"):
     valid_until = (date.today() + timedelta(days=30)).isoformat()
@@ -48,4 +50,5 @@ class TestMemberIntegration:
     async def test_delete_member(self, member_service):
         member = await _register(member_service)
         await member_service.delete(member.id)
-        assert await member_service.get(member.id) is None
+        with pytest.raises(EntityNotFoundException):
+            await member_service.get(member.id)

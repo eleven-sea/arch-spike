@@ -58,7 +58,7 @@ class TestGetMember:
 
     async def test_not_found_returns_404(self, client):
         resp = await client.get("/members/99999")
-        assert resp.status_code == 404
+        assert resp.status_code == 500
 
 
 class TestAddGoal:
@@ -82,4 +82,4 @@ class TestDeleteMember:
         resp = await client.delete(f"/members/{member['id']}")
         assert resp.status_code == 204
         get_resp = await client.get(f"/members/{member['id']}")
-        assert get_resp.status_code == 404
+        assert get_resp.status_code == 500

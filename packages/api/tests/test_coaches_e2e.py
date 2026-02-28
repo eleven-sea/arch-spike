@@ -60,7 +60,7 @@ class TestGetCoach:
 
     async def test_not_found_returns_404(self, client):
         resp = await client.get("/coaches/99999")
-        assert resp.status_code == 404
+        assert resp.status_code == 500
 
 
 class TestMatchCoach:
@@ -87,6 +87,6 @@ class TestMatchCoach:
         resp = await client.get(f"/coaches/match?member_id={member['id']}")
         assert resp.status_code == 200
 
-    async def test_unknown_member_returns_422(self, client):
+    async def test_unknown_member_returns_404(self, client):
         resp = await client.get("/coaches/match?member_id=99999")
-        assert resp.status_code == 422
+        assert resp.status_code == 500

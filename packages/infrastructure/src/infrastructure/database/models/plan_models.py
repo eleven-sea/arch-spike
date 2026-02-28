@@ -1,5 +1,5 @@
-
 from datetime import date, datetime
+from typing import override
 
 from sqlalchemy import BigInteger, Date, DateTime, ForeignKey, Integer, String, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -8,7 +8,6 @@ from infrastructure.database.base import Base
 
 
 class PlannedExerciseORM(Base):
-    """Stores a single PlannedExercise VO as a row."""
     __tablename__ = "planned_exercises"
 
     id: Mapped[int] = mapped_column(BigInteger, primary_key=True, autoincrement=True)
@@ -20,6 +19,11 @@ class PlannedExerciseORM(Base):
     sets: Mapped[int] = mapped_column(Integer, nullable=False)
     reps: Mapped[int] = mapped_column(Integer, nullable=False)
     rest_seconds: Mapped[int] = mapped_column(Integer, nullable=False)
+
+    @property
+    @override
+    def is_new(self) -> bool:
+        return self.id is None  # pyright: ignore[reportUnnecessaryComparison]
 
 
 class WorkoutSessionORM(Base):
@@ -41,6 +45,11 @@ class WorkoutSessionORM(Base):
         lazy="selectin",
     )
 
+    @property
+    @override
+    def is_new(self) -> bool:
+        return self.id is None  # pyright: ignore[reportUnnecessaryComparison]
+
 
 class TrainingPlanORM(Base):
     __tablename__ = "training_plans"
@@ -58,3 +67,8 @@ class TrainingPlanORM(Base):
         cascade="all, delete-orphan",
         lazy="selectin",
     )
+
+    @property
+    @override
+    def is_new(self) -> bool:
+        return self.id is None  # pyright: ignore[reportUnnecessaryComparison]

@@ -3,9 +3,6 @@ import os
 from alembic import context
 from sqlalchemy import create_engine, pool
 
-import infrastructure.database.models.coach_models  # pyright: ignore[reportUnusedImport]
-import infrastructure.database.models.member_models  # pyright: ignore[reportUnusedImport]
-import infrastructure.database.models.plan_models  # noqa: F401  # pyright: ignore[reportUnusedImport]
 from infrastructure.database.base import Base
 
 target_metadata = Base.metadata

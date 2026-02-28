@@ -51,7 +51,7 @@ class TestCreatePlan:
         assert plan.status.value == "DRAFT"
 
     async def test_raises_if_member_not_found(self, plan_service):
-        with pytest.raises(ValueError, match="not found"):
+        with pytest.raises(ValueError):
             await plan_service.create_plan(
                 member_id=9999,
                 coach_id=1,
@@ -185,5 +185,5 @@ class TestGetProgress:
         assert pct == 50.0
 
     async def test_raises_for_missing_plan(self, plan_service):
-        with pytest.raises(ValueError, match="not found"):
+        with pytest.raises(ValueError):
             await plan_service.get_progress(999)

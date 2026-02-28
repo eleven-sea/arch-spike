@@ -84,8 +84,6 @@ class CoachService:
     async def find_best_for_member(self, member_id: int) -> Coach | None:
         """Return the best matching coach for a member based on their goals and tier."""
         member = await self._member_repo.get_by_id(member_id)
-        if member is None:
-            raise ValueError(f"Member {member_id} not found")
         coaches = await self._repo.get_all()
         return CoachMatchingService.find_best_coach(member, coaches)
 

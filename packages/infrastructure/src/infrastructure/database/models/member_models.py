@@ -1,5 +1,5 @@
-
 from datetime import date
+from typing import override
 
 from sqlalchemy import BigInteger, Boolean, Date, ForeignKey, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -16,6 +16,11 @@ class FitnessGoalORM(Base):
     description: Mapped[str] = mapped_column(String(500), nullable=False)
     target_date: Mapped[date] = mapped_column(Date, nullable=False)
     achieved: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
+
+    @property
+    @override
+    def is_new(self) -> bool:
+        return self.id is None  # pyright: ignore[reportUnnecessaryComparison]
 
 
 class MemberORM(Base):
@@ -36,3 +41,8 @@ class MemberORM(Base):
         cascade="all, delete-orphan",
         lazy="selectin",
     )
+
+    @property
+    @override
+    def is_new(self) -> bool:
+        return self.id is None  # pyright: ignore[reportUnnecessaryComparison]

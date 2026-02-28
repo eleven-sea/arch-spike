@@ -30,8 +30,11 @@ class InMemoryMemberRepository(IMemberRepository):
         self._store[member.id] = member
         return member
 
-    async def get_by_id(self, id: int) -> Member | None:
-        return self._store.get(id)
+    async def get_by_id(self, id: int) -> Member:
+        r = self._store.get(id)
+        if r is None:
+            raise ValueError()
+        return r
 
     async def get_by_email(self, email: str) -> Member | None:
         return next((m for m in self._store.values() if m.email.value == email), None)
@@ -55,8 +58,11 @@ class InMemoryCoachRepository(ICoachRepository):
         self._store[coach.id] = coach
         return coach
 
-    async def get_by_id(self, id: int) -> Coach | None:
-        return self._store.get(id)
+    async def get_by_id(self, id: int) -> Coach:
+        r = self._store.get(id)
+        if r is None:
+            raise ValueError()
+        return r
 
     async def get_by_email(self, email: str) -> Coach | None:
         return next((c for c in self._store.values() if c.email.value == email), None)
@@ -92,8 +98,11 @@ class InMemoryPlanRepository(ITrainingPlanRepository):
         self._store[plan.id] = plan
         return plan
 
-    async def get_by_id(self, id: int) -> TrainingPlan | None:
-        return self._store.get(id)
+    async def get_by_id(self, id: int) -> TrainingPlan:
+        r = self._store.get(id)
+        if r is None:
+            raise ValueError()
+        return r
 
     async def get_by_member(self, member_id: int) -> list[TrainingPlan]:
         return [p for p in self._store.values() if p.member_id == member_id]

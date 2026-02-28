@@ -23,9 +23,9 @@ from infrastructure.clients.exercise_client import WgerClient
 from infrastructure.database.session import Database
 from infrastructure.database.transaction_manager import TransactionManager
 from infrastructure.redis.redis_client import RedisClient
-from infrastructure.repositories.coach_repository import PostgresCoachRepository
-from infrastructure.repositories.member_repository import PostgresMemberRepository
-from infrastructure.repositories.plan_repository import PostgresTrainingPlanRepository
+from infrastructure.repositories.coach_repository import CoachRepository, PostgresCoachRepository
+from infrastructure.repositories.member_repository import MemberRepository, PostgresMemberRepository
+from infrastructure.repositories.plan_repository import PostgresTrainingPlanRepository, TrainingPlanRepository
 from infrastructure.taskiq.broker import broker as _taskiq_broker
 
 
@@ -72,18 +72,22 @@ class Container(containers.DeclarativeContainer):
 
     transaction_manager = providers.Singleton(TransactionManager, database=database)
 
-    member_repository = providers.Singleton(
+    postgres_member_repository = providers.Singleton(
         PostgresMemberRepository,
         session_factory=database.provided.session,
     )
-    coach_repository = providers.Singleton(
+    postgres_coach_repository = providers.Singleton(
         PostgresCoachRepository,
         session_factory=database.provided.session,
     )
-    plan_repository = providers.Singleton(
+    postgres_plan_repository = providers.Singleton(
         PostgresTrainingPlanRepository,
         session_factory=database.provided.session,
     )
+
+    member_repository = providers.Singleton(MemberRepository, repo=postgres_member_repository)
+    coach_repository = providers.Singleton(CoachRepository, repo=postgres_coach_repository)
+    plan_repository = providers.Singleton(TrainingPlanRepository, repo=postgres_plan_repository)
 
     member_registered_handler = providers.Singleton(
         MemberRegisteredHandler, broker=broker_adapter, app_logger=app_logger

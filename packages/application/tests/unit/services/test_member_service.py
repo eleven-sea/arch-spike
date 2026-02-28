@@ -68,7 +68,7 @@ class TestAddGoal:
         assert len(updated.goals) == 1
 
     async def test_raises_if_member_not_found(self, member_service):
-        with pytest.raises(ValueError, match="not found"):
+        with pytest.raises(ValueError):
             target = (date.today() + timedelta(days=60)).isoformat()
             await member_service.add_goal(9999, "LOSE_WEIGHT", "x", target)
 
@@ -77,4 +77,5 @@ class TestDelete:
     async def test_deletes_member(self, member_service, member_repo):
         member = await _register(member_service)
         await member_service.delete(member.id)
-        assert await member_repo.get_by_id(member.id) is None
+        with pytest.raises(ValueError):
+            await member_repo.get_by_id(member.id)

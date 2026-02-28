@@ -43,8 +43,6 @@ class TrainingPlanService:
         logger = self._logger.get_logger(__name__)
 
         member = await self._member_repo.get_by_id(member_id)
-        if member is None:
-            raise ValueError(f"Member {member_id} not found")
         if member.active_plan_id is not None:
             raise ValueError(
                 f"Member {member_id} already has an active plan ({member.active_plan_id})"
@@ -67,8 +65,6 @@ class TrainingPlanService:
 
     async def activate_plan(self, plan_id: int) -> TrainingPlan:
         plan = await self._plan_repo.get_by_id(plan_id)
-        if plan is None:
-            raise ValueError(f"Plan {plan_id} not found")
 
         plan.activate()
         saved = await self._plan_repo.save(plan)
@@ -92,8 +88,6 @@ class TrainingPlanService:
     ) -> TrainingPlan:
         """Add a workout session with exercises (looked up / cached from wger)."""
         plan = await self._plan_repo.get_by_id(plan_id)
-        if plan is None:
-            raise ValueError(f"Plan {plan_id} not found")
 
         planned_exercises: list[PlannedExercise] = []
         for ex in exercises:
@@ -135,8 +129,6 @@ class TrainingPlanService:
         logger = self._logger.get_logger(__name__)
 
         plan = await self._plan_repo.get_by_id(plan_id)
-        if plan is None:
-            raise ValueError(f"Plan {plan_id} not found")
 
         plan.complete_session(session_id, notes)
         saved = await self._plan_repo.save(plan)
@@ -156,6 +148,4 @@ class TrainingPlanService:
 
     async def get_progress(self, plan_id: int) -> float:
         plan = await self._plan_repo.get_by_id(plan_id)
-        if plan is None:
-            raise ValueError(f"Plan {plan_id} not found")
         return PlanProgressService.completion_pct(plan)

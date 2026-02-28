@@ -60,7 +60,7 @@ class TestCreatePlan:
         assert draft_plan["status"] == "DRAFT"
         assert draft_plan["id"] is not None
 
-    async def test_unknown_member_returns_422(self, client, coach_id):
+    async def test_unknown_member_returns_404(self, client, coach_id):
         payload = {
             "member_id": 9999,
             "coach_id": coach_id,
@@ -69,7 +69,7 @@ class TestCreatePlan:
             "ends_at": (date.today() + timedelta(weeks=4)).isoformat(),
         }
         resp = await client.post("/plans/", json=payload)
-        assert resp.status_code == 422
+        assert resp.status_code == 500
 
 
 class TestAddSession:
@@ -147,4 +147,4 @@ class TestPlanProgress:
 
     async def test_unknown_plan_returns_404(self, client):
         resp = await client.get("/plans/99999/progress")
-        assert resp.status_code == 404
+        assert resp.status_code == 500

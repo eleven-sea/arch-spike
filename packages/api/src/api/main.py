@@ -20,6 +20,7 @@ def create_api(ctx: ApiApplicationContext | None = None) -> FastAPI:
     ctx.container.wire(packages=["api.routers"])
 
     app = FastAPI(title="Personal Training Studio API", lifespan=lifespan)
+
     app.container = ctx.container  # type: ignore[attr-defined]
     app.add_middleware(
         CORSMiddleware,
