@@ -46,8 +46,6 @@ async def get_member(
     member_service: MemberService = Depends(Provide[Container.member_service]),
 ) -> MemberResponse:
     member = await member_service.get(member_id)
-    if member is None:
-        raise HTTPException(status_code=404, detail=f"Member {member_id} not found")
     return MemberResponse.from_domain(member)
 
 

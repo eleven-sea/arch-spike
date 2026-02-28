@@ -7,8 +7,8 @@ Run with:
 
 from taskiq import TaskiqEvents, TaskiqState
 
+from bootstrap.broker import broker
 from bootstrap.context import WorkerApplicationContext
-from infrastructure.taskiq.broker import broker
 
 _ctx: WorkerApplicationContext | None = None
 

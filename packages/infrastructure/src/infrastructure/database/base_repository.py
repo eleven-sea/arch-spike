@@ -1,8 +1,9 @@
 from collections.abc import Callable
 from contextlib import AbstractAsyncContextManager
 
-from sqlalchemy import func, select
-from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import func
+from sqlmodel import select
+from sqlmodel.ext.asyncio.session import AsyncSession
 
 from infrastructure.database.base import Base
 from infrastructure.database.exceptions import EntityNotFoundException
@@ -21,8 +22,8 @@ class BaseRepository[T: Base, ID]:
 
     async def find_all(self) -> list[T]:
         async with self._session_factory() as session:
-            result = await session.execute(select(self._model))
-            return list(result.scalars().all())
+            result = await session.exec(select(self._model))
+            return list(result.all())
 
     async def get_by_id(self, id: ID) -> T:
         r = await self.find_by_id(id)
@@ -59,16 +60,16 @@ class BaseRepository[T: Base, ID]:
 
     async def delete_all(self) -> None:
         async with self._session_factory() as session:
-            result = await session.execute(select(self._model))
-            for entity in result.scalars().all():
+            result = await session.exec(select(self._model))
+            for entity in result.all():
                 await session.delete(entity)
 
     async def count(self) -> int:
         async with self._session_factory() as session:
-            result = await session.execute(
+            result = await session.exec(
                 select(func.count()).select_from(self._model)
             )
-            return result.scalar_one()
+            return result.one()
 
     async def exists(self, id: ID) -> bool:
         return await self.find_by_id(id) is not None

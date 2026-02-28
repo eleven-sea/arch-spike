@@ -1,74 +1,63 @@
 from datetime import date, datetime
-from typing import override
+from typing import ClassVar, override
 
-from sqlalchemy import BigInteger, Date, DateTime, ForeignKey, Integer, String, Text
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy import Column, DateTime
+from sqlmodel import Field, Relationship
 
 from infrastructure.database.base import Base
 
 
-class PlannedExerciseORM(Base):
-    __tablename__ = "planned_exercises"
-
-    id: Mapped[int] = mapped_column(BigInteger, primary_key=True, autoincrement=True)
-    session_id: Mapped[int] = mapped_column(
-        BigInteger, ForeignKey("workout_sessions.id", ondelete="CASCADE"), nullable=False
-    )
-    exercise_id: Mapped[str] = mapped_column(String(100), nullable=False)
-    name: Mapped[str] = mapped_column(String(200), nullable=False)
-    sets: Mapped[int] = mapped_column(Integer, nullable=False)
-    reps: Mapped[int] = mapped_column(Integer, nullable=False)
-    rest_seconds: Mapped[int] = mapped_column(Integer, nullable=False)
+class PlannedExerciseORM(Base, table=True):
+    __tablename__: ClassVar[str] = "planned_exercises"  # pyright: ignore[reportIncompatibleVariableOverride]
+    id: int | None = Field(default=None, primary_key=True)
+    session_id: int = Field(foreign_key="workout_sessions.id")
+    exercise_id: str = Field(max_length=100)
+    name: str = Field(max_length=200)
+    sets: int
+    reps: int
+    rest_seconds: int
 
     @property
     @override
     def is_new(self) -> bool:
-        return self.id is None  # pyright: ignore[reportUnnecessaryComparison]
+        return self.id is None
 
 
-class WorkoutSessionORM(Base):
-    __tablename__ = "workout_sessions"
-
-    id: Mapped[int] = mapped_column(BigInteger, primary_key=True, autoincrement=True)
-    plan_id: Mapped[int] = mapped_column(
-        BigInteger, ForeignKey("training_plans.id", ondelete="CASCADE"), nullable=False
+class WorkoutSessionORM(Base, table=True):
+    __tablename__: ClassVar[str] = "workout_sessions"  # pyright: ignore[reportIncompatibleVariableOverride]
+    id: int | None = Field(default=None, primary_key=True)
+    plan_id: int = Field(foreign_key="training_plans.id")
+    name: str = Field(max_length=200)
+    scheduled_date: date
+    status: str = Field(default="PENDING", max_length=20)
+    completed_at: datetime | None = Field(
+        default=None, sa_column=Column(DateTime(timezone=True), nullable=True)
     )
-    name: Mapped[str] = mapped_column(String(200), nullable=False)
-    scheduled_date: Mapped[date] = mapped_column(Date, nullable=False)
-    status: Mapped[str] = mapped_column(String(20), nullable=False, default="PENDING")
-    completed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
-    notes: Mapped[str | None] = mapped_column(Text, nullable=True)
-
-    exercises: Mapped[list[PlannedExerciseORM]] = relationship(
-        "PlannedExerciseORM",
-        cascade="all, delete-orphan",
-        lazy="selectin",
+    notes: str | None = Field(default=None)
+    exercises: list[PlannedExerciseORM] = Relationship(
+        sa_relationship_kwargs={"cascade": "all, delete-orphan", "lazy": "selectin"}
     )
 
     @property
     @override
     def is_new(self) -> bool:
-        return self.id is None  # pyright: ignore[reportUnnecessaryComparison]
+        return self.id is None
 
 
-class TrainingPlanORM(Base):
-    __tablename__ = "training_plans"
-
-    id: Mapped[int] = mapped_column(BigInteger, primary_key=True, autoincrement=True)
-    member_id: Mapped[int] = mapped_column(BigInteger, nullable=False)
-    coach_id: Mapped[int] = mapped_column(BigInteger, nullable=False)
-    name: Mapped[str] = mapped_column(String(200), nullable=False)
-    status: Mapped[str] = mapped_column(String(20), nullable=False, default="DRAFT")
-    starts_at: Mapped[date] = mapped_column(Date, nullable=False)
-    ends_at: Mapped[date] = mapped_column(Date, nullable=False)
-
-    sessions: Mapped[list[WorkoutSessionORM]] = relationship(
-        "WorkoutSessionORM",
-        cascade="all, delete-orphan",
-        lazy="selectin",
+class TrainingPlanORM(Base, table=True):
+    __tablename__: ClassVar[str] = "training_plans"  # pyright: ignore[reportIncompatibleVariableOverride]
+    id: int | None = Field(default=None, primary_key=True)
+    member_id: int
+    coach_id: int
+    name: str = Field(max_length=200)
+    status: str = Field(default="DRAFT", max_length=20)
+    starts_at: date
+    ends_at: date
+    sessions: list[WorkoutSessionORM] = Relationship(
+        sa_relationship_kwargs={"cascade": "all, delete-orphan", "lazy": "selectin"}
     )
 
     @property
     @override
     def is_new(self) -> bool:
-        return self.id is None  # pyright: ignore[reportUnnecessaryComparison]
+        return self.id is None

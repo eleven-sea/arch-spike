@@ -1,6 +1,6 @@
 from typing import override
 
-from sqlalchemy import select
+from sqlmodel import select
 
 from domain.members.member import Member
 from domain.members.repositories import IMemberRepository
@@ -15,8 +15,8 @@ class PostgresMemberRepository(BaseRepository[MemberORM, int]):
 
     async def find_by_email(self, email: str) -> MemberORM | None:
         async with self._session_factory() as session:
-            result = await session.execute(select(MemberORM).where(MemberORM.email == email))
-            return result.scalar_one_or_none()
+            result = await session.exec(select(MemberORM).where(MemberORM.email == email))
+            return result.one_or_none()
 
 
 class MemberRepository(IMemberRepository):

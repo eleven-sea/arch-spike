@@ -1,85 +1,73 @@
 from datetime import date
-from typing import override
+from typing import ClassVar, override
 
-from sqlalchemy import BigInteger, Date, ForeignKey, Integer, String
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlmodel import Field, Relationship
 
 from infrastructure.database.base import Base
 
 
-class CertificationORM(Base):
-    __tablename__ = "certifications"
-
-    id: Mapped[int] = mapped_column(BigInteger, primary_key=True, autoincrement=True)
-    coach_id: Mapped[int] = mapped_column(BigInteger, ForeignKey("coaches.id", ondelete="CASCADE"), nullable=False)
-    name: Mapped[str] = mapped_column(String(200), nullable=False)
-    issuing_body: Mapped[str] = mapped_column(String(200), nullable=False)
-    issued_at: Mapped[date] = mapped_column(Date, nullable=False)
-    expires_at: Mapped[date | None] = mapped_column(Date, nullable=True)
-
-    @property
-    @override
-    def is_new(self) -> bool:
-        return self.id is None  # pyright: ignore[reportUnnecessaryComparison]
-
-
-class AvailabilitySlotORM(Base):
-    __tablename__ = "availability_slots"
-
-    id: Mapped[int] = mapped_column(BigInteger, primary_key=True, autoincrement=True)
-    coach_id: Mapped[int] = mapped_column(BigInteger, ForeignKey("coaches.id", ondelete="CASCADE"), nullable=False)
-    day: Mapped[str] = mapped_column(String(3), nullable=False)
-    start_hour: Mapped[int] = mapped_column(Integer, nullable=False)
-    end_hour: Mapped[int] = mapped_column(Integer, nullable=False)
+class CertificationORM(Base, table=True):
+    __tablename__: ClassVar[str] = "certifications"  # pyright: ignore[reportIncompatibleVariableOverride]
+    id: int | None = Field(default=None, primary_key=True)
+    coach_id: int = Field(foreign_key="coaches.id")
+    name: str = Field(max_length=200)
+    issuing_body: str = Field(max_length=200)
+    issued_at: date
+    expires_at: date | None = Field(default=None)
 
     @property
     @override
     def is_new(self) -> bool:
-        return self.id is None  # pyright: ignore[reportUnnecessaryComparison]
+        return self.id is None
 
 
-class CoachSpecializationORM(Base):
-    __tablename__ = "coach_spec_rows"
-
-    id: Mapped[int] = mapped_column(BigInteger, primary_key=True, autoincrement=True)
-    coach_id: Mapped[int] = mapped_column(BigInteger, ForeignKey("coaches.id", ondelete="CASCADE"), nullable=False)
-    specialization: Mapped[str] = mapped_column(String(30), nullable=False)
+class AvailabilitySlotORM(Base, table=True):
+    __tablename__: ClassVar[str] = "availability_slots"  # pyright: ignore[reportIncompatibleVariableOverride]
+    id: int | None = Field(default=None, primary_key=True)
+    coach_id: int = Field(foreign_key="coaches.id")
+    day: str = Field(max_length=3)
+    start_hour: int
+    end_hour: int
 
     @property
     @override
     def is_new(self) -> bool:
-        return self.id is None  # pyright: ignore[reportUnnecessaryComparison]
+        return self.id is None
 
 
-class CoachORM(Base):
-    __tablename__ = "coaches"
+class CoachSpecializationORM(Base, table=True):
+    __tablename__: ClassVar[str] = "coach_spec_rows"  # pyright: ignore[reportIncompatibleVariableOverride]
+    id: int | None = Field(default=None, primary_key=True)
+    coach_id: int = Field(foreign_key="coaches.id")
+    specialization: str = Field(max_length=30)
 
-    id: Mapped[int] = mapped_column(BigInteger, primary_key=True, autoincrement=True)
-    first_name: Mapped[str] = mapped_column(String(100), nullable=False)
-    last_name: Mapped[str] = mapped_column(String(100), nullable=False)
-    email: Mapped[str] = mapped_column(String(255), unique=True, nullable=False)
-    bio: Mapped[str] = mapped_column(String(2000), nullable=False, default="")
-    tier: Mapped[str] = mapped_column(String(20), nullable=False)
-    max_clients: Mapped[int] = mapped_column(Integer, nullable=False, default=10)
-    current_client_count: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    @property
+    @override
+    def is_new(self) -> bool:
+        return self.id is None
 
-    certifications: Mapped[list[CertificationORM]] = relationship(
-        "CertificationORM",
-        cascade="all, delete-orphan",
-        lazy="selectin",
+
+class CoachORM(Base, table=True):
+    __tablename__: ClassVar[str] = "coaches"  # pyright: ignore[reportIncompatibleVariableOverride]
+    id: int | None = Field(default=None, primary_key=True)
+    first_name: str = Field(max_length=100)
+    last_name: str = Field(max_length=100)
+    email: str = Field(unique=True, max_length=255)
+    bio: str = Field(default="", max_length=2000)
+    tier: str = Field(max_length=20)
+    max_clients: int = Field(default=10)
+    current_client_count: int = Field(default=0)
+    certifications: list[CertificationORM] = Relationship(
+        sa_relationship_kwargs={"cascade": "all, delete-orphan", "lazy": "selectin"}
     )
-    available_slots: Mapped[list[AvailabilitySlotORM]] = relationship(
-        "AvailabilitySlotORM",
-        cascade="all, delete-orphan",
-        lazy="selectin",
+    available_slots: list[AvailabilitySlotORM] = Relationship(
+        sa_relationship_kwargs={"cascade": "all, delete-orphan", "lazy": "selectin"}
     )
-    specializations: Mapped[list[CoachSpecializationORM]] = relationship(
-        "CoachSpecializationORM",
-        cascade="all, delete-orphan",
-        lazy="selectin",
+    specializations: list[CoachSpecializationORM] = Relationship(
+        sa_relationship_kwargs={"cascade": "all, delete-orphan", "lazy": "selectin"}
     )
 
     @property
     @override
     def is_new(self) -> bool:
-        return self.id is None  # pyright: ignore[reportUnnecessaryComparison]
+        return self.id is None

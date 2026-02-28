@@ -2,10 +2,13 @@ import os
 
 from alembic import context
 from sqlalchemy import create_engine, pool
+from sqlmodel import SQLModel
 
-from infrastructure.database.base import Base
+import infrastructure.database.models.coach_models  # noqa: F401
+import infrastructure.database.models.member_models  # noqa: F401
+import infrastructure.database.models.plan_models  # noqa: F401
 
-target_metadata = Base.metadata
+target_metadata = SQLModel.metadata
 
 
 def get_sync_url() -> str:

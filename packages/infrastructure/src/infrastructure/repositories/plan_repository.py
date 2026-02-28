@@ -1,6 +1,6 @@
 from typing import override
 
-from sqlalchemy import select
+from sqlmodel import select
 
 from domain.plans.repositories import ITrainingPlanRepository
 from domain.plans.training_plan import TrainingPlan
@@ -15,10 +15,10 @@ class PostgresTrainingPlanRepository(BaseRepository[TrainingPlanORM, int]):
 
     async def find_by_member(self, member_id: int) -> list[TrainingPlanORM]:
         async with self._session_factory() as session:
-            result = await session.execute(
+            result = await session.exec(
                 select(TrainingPlanORM).where(TrainingPlanORM.member_id == member_id)
             )
-            return list(result.scalars().all())
+            return list(result.all())
 
 
 class TrainingPlanRepository(ITrainingPlanRepository):

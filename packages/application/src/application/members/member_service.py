@@ -72,7 +72,7 @@ class MemberService:
 
         return saved
 
-    async def get(self, member_id: int) -> Member | None:
+    async def get(self, member_id: int) -> Member:
         return await self._repo.get_by_id(member_id)
 
     async def get_all(self) -> list[Member]:

@@ -1,9 +1,9 @@
 from abc import abstractmethod
 
-from sqlalchemy.orm import DeclarativeBase
+from sqlmodel import SQLModel
 
 
-class Base(DeclarativeBase):
+class Base(SQLModel):
     @property
     @abstractmethod
     def is_new(self) -> bool: ...

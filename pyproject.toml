@@ -65,6 +65,7 @@ include = [
 exclude = [
     "**/tests/**",
     "conftest.py",
+    "**/migrations/**",
 ]
 # Biblioteki bez typed stubs (testcontainers, dependency-injector, taskiq, itp.)
 reportMissingTypeStubs = false
@@ -76,6 +77,7 @@ reportImplicitOverride = "error"
 target-version = "py312"
 src = ["packages/*/src"]
 line-length = 140
+extend-exclude = ["**/migrations/**"]
 
 [tool.ruff.lint]
 select = [

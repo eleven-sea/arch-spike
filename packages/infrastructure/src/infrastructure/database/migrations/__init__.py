@@ -4,6 +4,10 @@ from alembic import command
 from alembic.config import Config
 from sqlalchemy.ext.asyncio import AsyncEngine
 
+import infrastructure.database.models.coach_models  # noqa: F401
+import infrastructure.database.models.member_models  # noqa: F401
+import infrastructure.database.models.plan_models  # noqa: F401
+
 
 async def run_migrations(engine: AsyncEngine) -> None:
     alembic_cfg = Config()

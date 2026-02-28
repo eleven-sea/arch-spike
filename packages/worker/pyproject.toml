@@ -5,7 +5,7 @@ requires-python = ">=3.12"
 dependencies = [
     "application",
     "bootstrap",
-    "infrastructure",
+    "domain",
     "dependency-injector>=4.41",
     "taskiq>=0.11",
 ]
@@ -20,4 +20,4 @@ packages = ["src/worker"]
 [tool.uv.sources]
 application = { workspace = true }
 bootstrap = { workspace = true }
-infrastructure = { workspace = true }
+domain = { workspace = true }

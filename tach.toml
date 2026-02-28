@@ -22,7 +22,7 @@ depends_on = ["application", "bootstrap", "domain"]
 
 [[modules]]
 path = "worker"
-depends_on = ["application", "bootstrap", "infrastructure"]
+depends_on = ["application", "bootstrap", "domain"]
 
 [external]
 exclude = ["uvicorn", "asyncpg", "psycopg2_binary", "starlette"]

@@ -1,48 +1,42 @@
 from datetime import date
-from typing import override
+from typing import ClassVar, override
 
-from sqlalchemy import BigInteger, Boolean, Date, ForeignKey, String
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlmodel import Field, Relationship
 
 from infrastructure.database.base import Base
 
 
-class FitnessGoalORM(Base):
-    __tablename__ = "fitness_goals"
-
-    id: Mapped[int] = mapped_column(BigInteger, primary_key=True, autoincrement=True)
-    member_id: Mapped[int] = mapped_column(BigInteger, ForeignKey("members.id", ondelete="CASCADE"), nullable=False)
-    type: Mapped[str] = mapped_column(String(50), nullable=False)
-    description: Mapped[str] = mapped_column(String(500), nullable=False)
-    target_date: Mapped[date] = mapped_column(Date, nullable=False)
-    achieved: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
+class FitnessGoalORM(Base, table=True):
+    __tablename__: ClassVar[str] = "fitness_goals"  # pyright: ignore[reportIncompatibleVariableOverride]
+    id: int | None = Field(default=None, primary_key=True)
+    member_id: int = Field(foreign_key="members.id")
+    type: str = Field(max_length=50)
+    description: str = Field(max_length=500)
+    target_date: date
+    achieved: bool = Field(default=False)
 
     @property
     @override
     def is_new(self) -> bool:
-        return self.id is None  # pyright: ignore[reportUnnecessaryComparison]
+        return self.id is None
 
 
-class MemberORM(Base):
-    __tablename__ = "members"
-
-    id: Mapped[int] = mapped_column(BigInteger, primary_key=True, autoincrement=True)
-    first_name: Mapped[str] = mapped_column(String(100), nullable=False)
-    last_name: Mapped[str] = mapped_column(String(100), nullable=False)
-    email: Mapped[str] = mapped_column(String(255), unique=True, nullable=False)
-    phone: Mapped[str] = mapped_column(String(30), nullable=False)
-    fitness_level: Mapped[str] = mapped_column(String(20), nullable=False)
-    membership_tier: Mapped[str] = mapped_column(String(20), nullable=False)
-    membership_valid_until: Mapped[date] = mapped_column(Date, nullable=False)
-    active_plan_id: Mapped[int | None] = mapped_column(BigInteger, nullable=True)
-
-    goals: Mapped[list[FitnessGoalORM]] = relationship(
-        "FitnessGoalORM",
-        cascade="all, delete-orphan",
-        lazy="selectin",
+class MemberORM(Base, table=True):
+    __tablename__: ClassVar[str] = "members"  # pyright: ignore[reportIncompatibleVariableOverride]
+    id: int | None = Field(default=None, primary_key=True)
+    first_name: str = Field(max_length=100)
+    last_name: str = Field(max_length=100)
+    email: str = Field(unique=True, max_length=255)
+    phone: str = Field(max_length=30)
+    fitness_level: str = Field(max_length=20)
+    membership_tier: str = Field(max_length=20)
+    membership_valid_until: date
+    active_plan_id: int | None = Field(default=None)
+    goals: list[FitnessGoalORM] = Relationship(
+        sa_relationship_kwargs={"cascade": "all, delete-orphan", "lazy": "selectin"}
     )
 
     @property
     @override
     def is_new(self) -> bool:
-        return self.id is None  # pyright: ignore[reportUnnecessaryComparison]
+        return self.id is None

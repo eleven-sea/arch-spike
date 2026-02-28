@@ -2,12 +2,8 @@ import logging
 from contextlib import asynccontextmanager
 from contextvars import ContextVar
 
-from sqlalchemy.ext.asyncio import (
-    AsyncEngine,
-    AsyncSession,
-    async_sessionmaker,
-    create_async_engine,
-)
+from sqlalchemy.ext.asyncio import AsyncEngine, async_sessionmaker, create_async_engine
+from sqlmodel.ext.asyncio.session import AsyncSession
 
 _current_session: ContextVar[AsyncSession | None] = ContextVar("_current_session", default=None)
 _logger = logging.getLogger(__name__)
@@ -30,7 +26,7 @@ class Database:
             pool_recycle=pool_recycle,
         )
         self._session_factory = async_sessionmaker(
-            bind=self._engine, expire_on_commit=False
+            bind=self._engine, class_=AsyncSession, expire_on_commit=False
         )
 
     @asynccontextmanager

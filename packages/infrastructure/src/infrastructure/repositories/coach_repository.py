@@ -1,6 +1,6 @@
 from typing import override
 
-from sqlalchemy import select
+from sqlmodel import select
 
 from domain.coaches.coach import Coach
 from domain.coaches.repositories import ICoachRepository
@@ -16,18 +16,18 @@ class PostgresCoachRepository(BaseRepository[CoachORM, int]):
 
     async def find_by_email(self, email: str) -> CoachORM | None:
         async with self._session_factory() as session:
-            result = await session.execute(select(CoachORM).where(CoachORM.email == email))
-            return result.scalar_one_or_none()
+            result = await session.exec(select(CoachORM).where(CoachORM.email == email))
+            return result.one_or_none()
 
     async def find_by_specialization(self, spec: Specialization) -> list[CoachORM]:
         async with self._session_factory() as session:
-            result = await session.execute(
+            result = await session.exec(
                 select(CoachORM)
-                .join(CoachSpecializationORM, CoachORM.id == CoachSpecializationORM.coach_id)
+                .join(CoachSpecializationORM, CoachORM.id == CoachSpecializationORM.coach_id)  # type: ignore[arg-type]
                 .where(CoachSpecializationORM.specialization == spec.value)
                 .distinct()
             )
-            return list(result.scalars().all())
+            return list(result.all())
 
 
 class CoachRepository(ICoachRepository):
